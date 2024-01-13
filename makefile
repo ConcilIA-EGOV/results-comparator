@@ -5,7 +5,7 @@ all:
 
 run:
 	@echo "Digite o número de vezes que cada sentença se repete:"
-	@python3 comparator.py > Results/log.txt
+	@python3 src/comparator.py > Results/log.txt
 
 clean:
 	@rm -rf Results/*
