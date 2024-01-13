@@ -42,7 +42,8 @@ def compare(df1, df2, times=1):
     for r1 in range(num_rows1):
         for _ in range(times):
             r2 += 1
-            for c in range(num_cols1):
+            for c in range(1, num_cols1):
+                # print("r1 =", r1, "c =", c, "celula =", df1.iloc[r1, c])
                 if df1.iloc[r1, c] != df2.iloc[r2, c]:
                     errors_per_line[r2] += 1
                     errors_per_sentence[r1] += 1
@@ -65,13 +66,19 @@ def compare(df1, df2, times=1):
     return total_errors, line_errors, col_errors, errors_per_line, errors_per_sentence, wrong_sentences
 
 def main(variaveis):
-
-    times = int(input())
     # Lê arquivos
-    # df1 = pd.read_excel('tables/Or.xlsx')
-    # df2 = pd.read_excel('tables/GPT.xlsx')
     df1 = pd.read_excel('tables/source.xlsx')
     df2 = pd.read_excel('tables/test.xlsx')
+
+# cálculo do número de vezes que cada sentença se repete
+    times = 1
+    s1 = df2.iloc[0, 0]
+    while True:
+        s2 = df2.iloc[times, 0]
+        if s1 == s2:
+            times += 1
+        else:
+            break
     
 
     # Compara arquivos
@@ -119,6 +126,6 @@ def main(variaveis):
 # 3 - A contagem de erros por sentença deve incluir todas as repetições? Ou só as mais frequentes?
 # 4 - A contagem de erros por variável deve incluir todas as repetições? Ou só as mais frequentes?
 # 5 - Caso alguma das repetições não tenha erros, mas outras sim, como isso deveria ser contado?
-# 6 - Como a média das repetições deve ser feita?
+# 6 - Como a média das repetições (para avaliar como uma sentença se saiu) deve ser feita?
 
 main(variaveis)

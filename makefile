@@ -4,8 +4,8 @@ all:
 	@echo "Digite make clean_tables para limpar as tabelas de input"
 
 run:
-	@echo "Digite o número de vezes que cada sentença se repete:"
 	@python3 src/comparator.py > Results/log.txt
+	@cat Results/log.txt
 
 clean:
 	@rm -rf Results/*
