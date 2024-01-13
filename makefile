@@ -4,6 +4,7 @@ all:
 	@echo "Digite make clean_tables para limpar as tabelas de input"
 
 run:
+	@touch Results/log.txt
 	@python3 src/comparator.py > Results/log.txt
 	@cat Results/log.txt
 
