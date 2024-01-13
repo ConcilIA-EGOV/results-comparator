@@ -1,8 +1,8 @@
 # Ignore changes in the Result folder
-# Results/
+Results/
 
 # Ignore changes in the tables folder
-# tables/
+tables/
 
 # Ignore changes in the build folder
 build/
