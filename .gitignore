@@ -1,9 +1,8 @@
 # Ignore changes in the Result folder
-  Results/*.xlsx
-  Results/log.txt
+  Results/
 
 # Ignore changes in the tables folder
-  tables/*.xlsx
+  tables/
 
 # Ignore changes in the build folder
 build/
