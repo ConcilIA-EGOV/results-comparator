@@ -1,12 +1,10 @@
 import pandas as pd
 import openpyxl
 
-
+# labels para cada variável
 variaveis = ["Sentença", "direito de arrependimento", "descumprimento de oferta", "extravio definitivo", "extravio temporário", "intervalo de extravio", "violação", "cancelamento (sem realocação)/alteração de destino", "atraso de voo", "intervalo de atraso", "culpa exclusiva do consumidor", "inoperabilidade do aeroporto", "no show", "overbooking", "assistência da companhia aérea", "agência de viagem", "hipervulnerabilidade"]
 
 # Receives 2 excel sheets and compares them
-# Also receives the number of times each sentence
-# is repeated in the sheets
 def compare(df1, df2, times=1):
 
     # Inicializa variáveis
@@ -119,13 +117,5 @@ def main(variaveis):
         dec_num = round(number - num_int, 2)*100
         resultado = 'erros, %.2d.%.2d%% do total' % (number, dec_num)
         print(id, resultado, ':', variaveis[i])
-
-# questões:
-# 1 - A planilha de resultado final deve ter apenas 1 linha por sentença?
-# 2 - A contagem de erros totais deve incluir todas as repetições? Ou só as mais frequentes?
-# 3 - A contagem de erros por sentença deve incluir todas as repetições? Ou só as mais frequentes?
-# 4 - A contagem de erros por variável deve incluir todas as repetições? Ou só as mais frequentes?
-# 5 - Caso alguma das repetições não tenha erros, mas outras sim, como isso deveria ser contado?
-# 6 - Como a média das repetições (para avaliar como uma sentença se saiu) deve ser feita?
 
 main(variaveis)
