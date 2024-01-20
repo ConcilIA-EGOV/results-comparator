@@ -5,6 +5,8 @@ import openpyxl
 variaveis = ["Sentença", "direito de arrependimento", "descumprimento de oferta", "extravio definitivo", "extravio temporário", "intervalo de extravio", "violação", "cancelamento (sem realocação)/alteração de destino", "atraso de voo", "intervalo de atraso", "culpa exclusiva do consumidor", "inoperabilidade do aeroporto", "no show", "overbooking", "assistência da companhia aérea", "agência de viagem", "hipervulnerabilidade"]
 
 # Receives 2 excel sheets and compares them
+# Also receives the number of times each sentence
+# is repeated in the sheets
 def compare(df1, df2, times=1):
 
     # Inicializa variáveis
