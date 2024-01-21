@@ -6,4 +6,6 @@ Results/log.txt
 tables/*.xlsx
 
 # Ignore changes in the build folder
-build/
+.vscode/
+
+src/__pycache__

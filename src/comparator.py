@@ -1,20 +1,9 @@
 import pandas as pd
 import openpyxl
+import modulator as md
 
 
 variaveis = ["Sentença", "direito de arrependimento", "descumprimento de oferta", "extravio definitivo", "extravio temporário", "intervalo de extravio", "violação", "cancelamento (sem realocação)/alteração de destino", "atraso de voo", "intervalo de atraso", "culpa exclusiva do consumidor", "inoperabilidade do aeroporto", "no show", "overbooking", "assistência da companhia aérea", "agência de viagem", "hipervulnerabilidade"]
-
-def get_average_sheet(df0: pd.DataFrame) -> pd.DataFrame:
-    # cálculo do número de vezes que cada sentença se repete
-    times = 1
-    s1 = df0.iloc[0, 0]
-    while True:
-        s2 = df0.iloc[times, 0]
-        if s1 == s2:
-            times += 1
-        else:
-            break
-    return None
 
 # Receives 2 excel sheets and compares them
 def compare(df1: pd.DataFrame, df2: pd.DataFrame) -> (int, int, [int], [int]):
@@ -25,11 +14,11 @@ def compare(df1: pd.DataFrame, df2: pd.DataFrame) -> (int, int, [int], [int]):
     
     if num_cols1 != num_cols2:
         print('Número de colunas diferentes', num_cols1, num_cols2)
-        return -1, -1, -1, [-1], [-1]
+        return -1, -1, [-1], [-1]
 
     if (num_rows1) != num_rows2:
         print('Número de linhas diferentes', num_rows1, num_rows2)
-        return -2, -2, -1, [-2], [-2]
+        return -2, -2, [-2], [-2]
 
     total_errors = 0
     line_errors = 0
@@ -45,11 +34,14 @@ def compare(df1: pd.DataFrame, df2: pd.DataFrame) -> (int, int, [int], [int]):
     if sheet is None:
         sheet = book.create_sheet('Sheet1')
 
-    r2 = -1
     # Percorre as células comparando valores
     for r1 in range(num_rows1):
         for c in range(1, num_cols1):
             if df1.iloc[r1, c] != df2.iloc[r1, c]:
+                # Se for float, arredonda para 2 casas decimais
+                if type(df2.iloc[r1, c]) == float:
+                    if round(float(df1.iloc[r1, c]), 2) == df2.iloc[r1, c]:
+                        continue
                 errors_per_line[r1] += 1
                 cell = sheet.cell(row=r1+2, column=c+1)
                 cell.fill = openpyxl.styles.PatternFill(fgColor="FFFF00", fill_type = "solid")
@@ -71,10 +63,11 @@ def main(variaveis):
     # Lê arquivos
     df1 = pd.read_excel('tables/source.xlsx')
     df_temp = pd.read_excel('tables/test.xlsx')
-    df2 = get_average_sheet(df_temp)
+    df2 = md.get_average_sheet(df_temp)
 
     # Compara arquivos
-    total_errors, line_errors, col_errors, errors_per_line = compare(df1, df2)
+    (total_errors, line_errors, col_errors, errors_per_line) = compare(df1, df2)
+
     if total_errors < 0:
         return -1
 
@@ -84,7 +77,7 @@ def main(variaveis):
     n_variaveis -= 1
     total_values = n_sentences * (n_variaveis)
 
-    print("Número de sentenças:", n_sentences, "--> repetidas", times, "vezes cada")
+    print("Número de sentenças:", n_sentences)
     print("Número de variáveis:", n_variaveis)
     print("Número total de valores:", total_values, end='\n\n')
 
