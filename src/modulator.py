@@ -63,8 +63,5 @@ def get_average_sheet(df0: pd.DataFrame) -> pd.DataFrame:
         freq_row = count_frequencies(df0, times, index)
         df_out = df_out._append(freq_row, ignore_index=True)
 
+    df_out.to_excel('Results/test2.xlsx', index=False)
     return df_out
-
-df_temp = pd.read_excel('tables/test.xlsx')
-df2 = get_average_sheet(df_temp)
-df2.to_excel('test2.xlsx', index=False)
