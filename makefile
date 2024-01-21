@@ -4,13 +4,12 @@ all:
 	@echo "Digite make clean_tables para limpar as tabelas de input"
 
 run:
-	@python3 src/comparator.py > Results/log.txt
-	@cat Results/log.txt
+	@python3 src/comparator.py > Results/log.md
+	@cat Results/log.md
 
 clean:
 	@rm -rf Results/*.xlsx
-	@> Results/log.txt
-	@touch Results/log.txt
+	@> Results/log.md
 
 clean_tables:
 	@rm -rf tables/*.xlsx
