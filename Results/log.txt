@@ -1,0 +1,41 @@
+Número de sentenças: 10
+Número de variáveis: 16
+Número total de valores: 160
+
+Número Total de Erros: 36
+Porcentagem Total de Erros: 22.50%
+
+Número de Linhas com Erros: 10
+Porcentagem de Linhas com Erros: 100.00%
+
+Erros por Sentença:
+
+ - 05 erros, 31.25% de erro
+ - 04 erros, 25.00% de erro
+ - 03 erros, 18.75% de erro
+ - 05 erros, 31.25% de erro
+ - 02 erros, 12.50% de erro
+ - 04 erros, 25.00% de erro
+ - 02 erros, 12.50% de erro
+ - 04 erros, 25.00% de erro
+ - 05 erros, 31.25% de erro
+ - 02 erros, 12.50% de erro
+
+Erros por Variável:
+
+01 - 00 erros, 00.00% do total : direito de arrependimento
+02 - 01 erros, 10.00% do total : descumprimento de oferta
+03 - 00 erros, 00.00% do total : extravio definitivo
+04 - 06 erros, 60.00% do total : extravio temporário
+05 - 06 erros, 60.00% do total : intervalo de extravio
+06 - 00 erros, 00.00% do total : violação
+07 - 09 erros, 90.00% do total : cancelamento (sem realocação)/alteração de destino
+08 - 01 erros, 10.00% do total : atraso de voo
+09 - 09 erros, 90.00% do total : intervalo de atraso
+10 - 00 erros, 00.00% do total : culpa exclusiva do consumidor
+11 - 00 erros, 00.00% do total : inoperabilidade do aeroporto
+12 - 00 erros, 00.00% do total : no show
+13 - 00 erros, 00.00% do total : overbooking
+14 - 02 erros, 20.00% do total : assistência da companhia aérea
+15 - 01 erros, 10.00% do total : agência de viagem
+16 - 01 erros, 10.00% do total : hipervulnerabilidade
