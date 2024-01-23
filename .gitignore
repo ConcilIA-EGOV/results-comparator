@@ -1,6 +1,6 @@
 # Ignore changes in the Result folder
 Results/*.xlsx
-# Results/dados.txt
+Results/dados.txt
 
 # Ignore changes in the tables folder
 tables/*.xlsx
