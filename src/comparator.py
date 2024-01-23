@@ -37,10 +37,12 @@ def compare(df1: pd.DataFrame, df2: pd.DataFrame) -> (int, int, [int], [int]):
     # Percorre as células comparando valores
     for r1 in range(num_rows1):
         for c in range(1, num_cols1):
-            if df1.iloc[r1, c] != df2.iloc[r1, c]:
+            v1 = df1.iloc[r1, c]
+            v2 = df2.iloc[r1, c]
+            if v1 != v2:
                 # Se for float, arredonda para 2 casas decimais
-                if type(df2.iloc[r1, c]) == float:
-                    if round(float(df1.iloc[r1, c]), 2) == df2.iloc[r1, c]:
+                if type(v2) == float:
+                    if v1 != '-' and round(float(v1), 2) == v2:
                         continue
                 errors_per_line[r1] += 1
                 cell = sheet.cell(row=r1+2, column=c+1)
@@ -104,13 +106,5 @@ def main(variaveis):
         print(id, resultado, ':', variaveis[i])
 
     return 0
-
-# questões:
-# 1 - A planilha de resultado final deve ter apenas 1 linha por sentença?
-# 2 - A contagem de erros totais deve incluir todas as repetições? Ou só as mais frequentes?
-# 3 - A contagem de erros por sentença deve incluir todas as repetições? Ou só as mais frequentes?
-# 4 - A contagem de erros por variável deve incluir todas as repetições? Ou só as mais frequentes?
-# 5 - Caso alguma das repetições não tenha erros, mas outras sim, como isso deveria ser contado?
-# 6 - Como a média das repetições (para avaliar como uma sentença se saiu) deve ser feita?
 
 main(variaveis)

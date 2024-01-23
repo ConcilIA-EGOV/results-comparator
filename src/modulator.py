@@ -30,8 +30,11 @@ def count_frequencies(df0: pd.DataFrame, times: int, index) -> pd.DataFrame:
                 frequent_value = value
                 max_freq = freq
 
-        if type(frequent_value) == float or type(frequent_value) == int:
-            frequent_value = round(float(frequent_value), 2)
+        if c[:9] == "intervalo":
+            try:
+                frequent_value = round(float(frequent_value), 2)
+            except:
+                frequent_value = frequent_value
         # Atribui o mais frequente
         freq_row[c] = frequent_value
 
