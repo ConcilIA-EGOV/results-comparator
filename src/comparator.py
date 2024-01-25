@@ -3,7 +3,7 @@ import openpyxl
 import modulator as md
 
 
-variaveis = ["Sentença", "direito de arrependimento", "descumprimento de oferta", "extravio definitivo", "extravio temporário", "intervalo de extravio", "violação", "cancelamento (sem realocação)/alteração de destino", "atraso de voo", "intervalo de atraso", "culpa exclusiva do consumidor", "inoperabilidade do aeroporto", "no show", "overbooking", "assistência da companhia aérea", "agência de viagem", "hipervulnerabilidade"]
+VARIAVEIS = ["Sentença", "direito de arrependimento", "descumprimento de oferta", "extravio definitivo", "extravio temporário", "intervalo de extravio", "violação", "cancelamento (sem realocação)/alteração de destino", "atraso de voo", "intervalo de atraso", "culpa exclusiva do consumidor", "inoperabilidade do aeroporto", "no show", "overbooking", "assistência da companhia aérea", "agência de viagem", "hipervulnerabilidade"]
 
 # Receives 2 excel sheets and compares them
 def compare(df1: pd.DataFrame, df2: pd.DataFrame) -> (int, int, [int], [int]):
@@ -40,15 +40,19 @@ def compare(df1: pd.DataFrame, df2: pd.DataFrame) -> (int, int, [int], [int]):
             v1 = df1.iloc[r1, c]
             v2 = df2.iloc[r1, c]
             if v1 != v2:
-                # Se for float, arredonda para 2 casas decimais
-                if type(v2) == float:
-                    if v1 != '-' and round(float(v1), 2) == v2:
-                        continue
-                errors_per_line[r1] += 1
-                cell = sheet.cell(row=r1+2, column=c+1)
-                cell.fill = openpyxl.styles.PatternFill(fgColor="FFFF00", fill_type = "solid")
-                total_errors += 1
-                col_errors[c] += 1
+                try:
+                    # Se for float, arredonda para 2 casas decimais
+                    if type(v2) == float:
+                        if v1 != '-' and round(float(v1), 2) == v2:
+                            continue
+                except:
+                    pass
+                finally:
+                    errors_per_line[r1] += 1
+                    cell = sheet.cell(row=r1+2, column=c+1)
+                    cell.fill = openpyxl.styles.PatternFill(fgColor="FFFF00", fill_type = "solid")
+                    total_errors += 1
+                    col_errors[c] += 1
         if errors_per_line[r1] > 0:
             cell = sheet.cell(row=r1+2, column=1)
             cell.fill = openpyxl.styles.PatternFill(fgColor="FFFF00", fill_type = "solid")
@@ -68,7 +72,7 @@ def main(variaveis):
     df2 = md.get_average_sheet(df_temp)
 
     # Compara arquivos
-    (total_errors, line_errors, col_errors, errors_per_line) = compare(df1, df2)
+    (total_errors, line_errors, errors_per_col, errors_per_line) = compare(df1, df2)
 
     if total_errors < 0:
         return -1
@@ -96,10 +100,15 @@ def main(variaveis):
         dec_num = round(number - num_int, 2)*100
         resultado = 'erros, %.2d.%.2d%% de erro' % (number, dec_num)
         print(id, resultado)
+    col_errors = 0
+    for i in errors_per_col:
+        col_errors += int(i > 0)
+    print('\nNúmero de Variáveis com Erros:', col_errors)
+    print("Porcentagem de Variáveis com Erros: %.2f%%" % (col_errors/n_variaveis * 100))
     print('\nErros por Variável:\n')
     for i in range(1, n_variaveis + 1):
-        id = ("%.2d" % i) + (' - %.2d' % col_errors[i])
-        number = (col_errors[i]/n_lines * 100)
+        id = ("%.2d" % i) + (' - %.2d' % errors_per_col[i])
+        number = (errors_per_col[i]/n_lines * 100)
         num_int = int(number)
         dec_num = round(number - num_int, 2)*100
         resultado = 'erros, %.2d.%.2d%% do total' % (number, dec_num)
@@ -107,4 +116,4 @@ def main(variaveis):
 
     return 0
 
-main(variaveis)
+main(VARIAVEIS)

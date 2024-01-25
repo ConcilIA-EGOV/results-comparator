@@ -17,6 +17,8 @@ def count_frequencies(df0: pd.DataFrame, times: int, index) -> pd.DataFrame:
         values = {}
         for i in range(times):
             cell = df0.iloc[index + i - (times - 1)][c]
+            if cell == '':
+                continue
             if cell in values:
                 values[cell] += 1
             else:
@@ -30,7 +32,7 @@ def count_frequencies(df0: pd.DataFrame, times: int, index) -> pd.DataFrame:
                 frequent_value = value
                 max_freq = freq
 
-        if c[:9] == "intervalo":
+        if c[:9] == "intervalo" or c[:9] == "Intervalo":
             try:
                 frequent_value = round(float(frequent_value), 2)
             except:
