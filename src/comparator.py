@@ -5,6 +5,10 @@ import modulator as md
 
 VARIAVEIS = ["Sentença", "direito de arrependimento", "descumprimento de oferta", "extravio definitivo", "extravio temporário", "intervalo de extravio", "violação", "cancelamento (sem realocação)/alteração de destino", "atraso de voo", "intervalo de atraso", "culpa exclusiva do consumidor", "inoperabilidade do aeroporto", "no show", "overbooking", "assistência da companhia aérea", "agência de viagem", "hipervulnerabilidade"]
 
+ARQUIVO_DE_SAIDA = 'Resultados/resultado.xlsx'
+SOURCE = 'tables/source.xlsx'
+TEST = 'tables/test.xlsx'
+
 # Receives 2 excel sheets and compares them
 def compare(df1: pd.DataFrame, df2: pd.DataFrame) -> (int, int, [int], [int]):
 
@@ -26,7 +30,7 @@ def compare(df1: pd.DataFrame, df2: pd.DataFrame) -> (int, int, [int], [int]):
     errors_per_line = [0 for i in range(num_rows1)]
     
     # opens the excel file to write the results
-    writer = pd.ExcelWriter('Results/resultado.xlsx', engine='openpyxl')
+    writer = pd.ExcelWriter(ARQUIVO_DE_SAIDA, engine='openpyxl')
     book = writer.book
     
     # Obtém a planilha para poder alterar cores
@@ -67,8 +71,8 @@ def compare(df1: pd.DataFrame, df2: pd.DataFrame) -> (int, int, [int], [int]):
 
 def main(variaveis):
     # Lê arquivos
-    df1 = pd.read_excel('tables/source.xlsx')
-    df_temp = pd.read_excel('tables/test.xlsx')
+    df1 = pd.read_excel(SOURCE)
+    df_temp = pd.read_excel(TEST)
     df2 = md.get_average_sheet(df_temp)
 
     # Compara arquivos

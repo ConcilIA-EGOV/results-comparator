@@ -1,6 +1,6 @@
 # Ignore changes in the Result folder
-Results/*.xlsx
-Results/log.txt
+Resultados/*.xlsx
+Resultados/log.txt
 
 # Ignore changes in the tables folder
 tables/*.xlsx
