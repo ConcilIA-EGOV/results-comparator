@@ -9,7 +9,7 @@ run:
 
 clean:
 	@rm -rf Resultados/*.xlsx
-	@> Resultados/log.txt
+	@rm -rf Resultados/*.txt
 
 clean_tables:
 	@rm -rf tables/*.xlsx
