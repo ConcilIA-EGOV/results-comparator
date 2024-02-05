@@ -73,7 +73,7 @@ def main(variaveis):
     # Lê arquivos
     df1 = pd.read_excel(SOURCE)
     df_temp = pd.read_excel(TEST)
-    df2 = md.get_average_sheet(df_temp)
+    df2, draws = md.get_average_sheet(df_temp)
 
     # Compara arquivos
     (total_errors, line_errors, errors_per_col, errors_per_line) = compare(df1, df2)
@@ -89,7 +89,8 @@ def main(variaveis):
 
     print("Número de sentenças:", n_sentences)
     print("Número de variáveis:", n_variaveis)
-    print("Número total de valores:", total_values, end='\n\n')
+    print("Número total de valores:", total_values)
+    print("Número de empates:", draws, end='\n\n')
 
     # Imprime resultados
     print('Número Total de Erros:', total_errors)

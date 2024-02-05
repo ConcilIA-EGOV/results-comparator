@@ -2,7 +2,7 @@ import pandas as pd
 import warnings
 warnings.filterwarnings("ignore")
 
-def count_frequencies(df0: pd.DataFrame, times: int, index) -> pd.DataFrame:
+def count_frequencies(df0: pd.DataFrame, times: int, index:int, draws:int) -> pd.DataFrame:
     freq_row = pd.DataFrame(columns=df0.columns)
     
     # Adiciona uma linha vazia
@@ -31,6 +31,8 @@ def count_frequencies(df0: pd.DataFrame, times: int, index) -> pd.DataFrame:
             if freq > max_freq:
                 frequent_value = value
                 max_freq = freq
+            elif freq == max_freq:
+                draws += 1
 
         if c[:9] == "intervalo" or c[:9] == "Intervalo":
             try:
@@ -40,12 +42,13 @@ def count_frequencies(df0: pd.DataFrame, times: int, index) -> pd.DataFrame:
         # Atribui o mais frequente
         freq_row[c] = frequent_value
 
-    return freq_row
+    return freq_row, draws
 
 def get_average_sheet(df0: pd.DataFrame) -> pd.DataFrame:
     df_out = pd.DataFrame(columns=df0.columns)
     sentence = ''
     times = 0
+    draws = 0
     
     for index, row in df0.iterrows():
         if sentence != row['Sentença']:
@@ -53,7 +56,7 @@ def get_average_sheet(df0: pd.DataFrame) -> pd.DataFrame:
             if times > 0:
                 # Quando mudar de sentença, o times terá
                 # o número de repetições da sentença anterior
-                freq_row = count_frequencies(df0, times, index-1) 
+                freq_row, draws = count_frequencies(df0, times, index-1, draws) 
                 df_out = df_out._append(freq_row, ignore_index=True)
             
             sentence = row['Sentença']
@@ -65,8 +68,8 @@ def get_average_sheet(df0: pd.DataFrame) -> pd.DataFrame:
 
     if times > 0:
         # Processa última sentença
-        freq_row = count_frequencies(df0, times, index)
+        freq_row, draws = count_frequencies(df0, times, index, draws)
         df_out = df_out._append(freq_row, ignore_index=True)
 
 #   df_out.to_excel('Results/averaged_sheet.xlsx', index=False)
-    return df_out
+    return df_out, draws
