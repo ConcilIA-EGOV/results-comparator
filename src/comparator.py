@@ -99,7 +99,7 @@ def main(variaveis):
     print("\n---------------- Sentenças -----------------\n")
     print('Número de Sentenças com Erros:', line_errors)
     print("Porcentagem de Sentenças com Erros: %.2f%%" % (line_errors/n_lines * 100))
-    print('\nErros por Sentença:\n')
+    print('\nErros por Sentença:')
     media_de_erros_por_sentenca = 0
     maior_erro_em_uma_sentenca = 0
 
@@ -123,11 +123,11 @@ def main(variaveis):
     print("\n--------------- Variáveis ----------------\n")
     print('Número de Variáveis com Erros:', col_errors)
     print("Porcentagem de Variáveis com Erros: %.2f%%" % (col_errors/n_variaveis * 100))
-    print('\nErros por Variável:\n')
+    print('\nErros por Variável:')
     media_de_erros_por_variavel = 0
     maior_erro_em_uma_variavel = 0
     for i in range(1, n_variaveis + 1):
-        id = ("%.2d" % i) + (' - %.3d' % errors_per_col[i])
+        id = (" %.2d" % i) + (' - %.3d' % errors_per_col[i])
         media_de_erros_por_variavel += errors_per_col[i]
         if errors_per_col[i] > maior_erro_em_uma_variavel:
             maior_erro_em_uma_variavel = errors_per_col[i]
