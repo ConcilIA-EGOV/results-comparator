@@ -87,38 +87,59 @@ def main(variaveis):
     n_variaveis -= 1
     total_values = n_sentences * (n_variaveis)
 
-    print("Número de sentenças:", n_sentences)
-    print("Número de variáveis:", n_variaveis)
-    print("Número total de valores:", total_values)
-    print("Número de empates:", draws, end='\n\n')
+    print("Número de Sentenças:", n_sentences)
+    print("Número de Variáveis:", n_variaveis)
+    print("Número Total de Valores:", total_values)
+    print("Número de Empates:", draws, end='\n\n')
 
     # Imprime resultados
     print('Número Total de Erros:', total_errors)
     print("Porcentagem Total de Erros: %.2f%%" % (total_errors/total_values * 100))
-    print('\nNúmero de Linhas com Erros:', line_errors)
-    print("Porcentagem de Linhas com Erros: %.2f%%" % (line_errors/n_lines * 100))
+    print('\nNúmero de Sentenças com Erros:', line_errors)
+    print("Porcentagem de Sentenças com Erros: %.2f%%" % (line_errors/n_lines * 100))
     print('\nErros por Sentença:\n')
+    media_de_erros_por_sentenca = 0
+    maior_erro_em_uma_sentenca = 0
+
     for r in range(n_sentences):
         id = ' - %.2d' % errors_per_line[r]
+        media_de_erros_por_sentenca += errors_per_line[r]
+        if errors_per_line[r] > maior_erro_em_uma_sentenca:
+            maior_erro_em_uma_sentenca = errors_per_line[r]
         number = (errors_per_line[r]/(n_variaveis) * 100)
         num_int = int(number)
         dec_num = round(number - num_int, 2)*100
         resultado = 'erros, %.2d.%.2d%% de erro' % (number, dec_num)
         print(id, resultado)
+    media_de_erros_por_sentenca //= n_sentences
+    print('\nMaior Erro em uma Sentença:', maior_erro_em_uma_sentenca)
+    print('Média de Erros por Sentença:', media_de_erros_por_sentenca)
+    print("Porcentagem Média de Erros por Sentença: %.2f%%" % (media_de_erros_por_sentenca/(n_variaveis) * 100), end='\n\n')
     col_errors = 0
     for i in errors_per_col:
         col_errors += int(i > 0)
     print('\nNúmero de Variáveis com Erros:', col_errors)
     print("Porcentagem de Variáveis com Erros: %.2f%%" % (col_errors/n_variaveis * 100))
     print('\nErros por Variável:\n')
+    media_de_erros_por_variavel = 0
+    maior_erro_em_uma_variavel = 0
     for i in range(1, n_variaveis + 1):
-        id = ("%.2d" % i) + (' - %.2d' % errors_per_col[i])
+        id = ("%.2d" % i) + (' - %.3d' % errors_per_col[i])
+        media_de_erros_por_variavel += errors_per_col[i]
+        if errors_per_col[i] > maior_erro_em_uma_variavel:
+            maior_erro_em_uma_variavel = errors_per_col[i]
         number = (errors_per_col[i]/n_lines * 100)
         num_int = int(number)
         dec_num = round(number - num_int, 2)*100
+        if dec_num == 100:
+            dec_num = 0
+            number += 1
         resultado = 'erros, %.2d.%.2d%% do total' % (number, dec_num)
         print(id, resultado, ':', variaveis[i])
-
+    media_de_erros_por_variavel //= n_variaveis
+    print('\nMaior Número de Erros em uma Variável:', maior_erro_em_uma_variavel)
+    print('Média de Erros por Variável:', media_de_erros_por_variavel)
+    print("Porcentagem Média de Erros por Variável: %.2f%%" % (media_de_erros_por_variavel/n_lines * 100))
     return 0
 
 main(VARIAVEIS)
