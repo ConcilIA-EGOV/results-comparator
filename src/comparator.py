@@ -90,19 +90,21 @@ def main(variaveis):
     print("Número de Sentenças:", n_sentences)
     print("Número de Variáveis:", n_variaveis)
     print("Número Total de Valores:", total_values)
-    print("Número de Empates:", draws, end='\n\n')
+    if draws > 0:
+        print("Número de Empates:", draws)
 
     # Imprime resultados
-    print('Número Total de Erros:', total_errors)
+    print('\nNúmero Total de Erros:', total_errors)
     print("Porcentagem Total de Erros: %.2f%%" % (total_errors/total_values * 100))
-    print('\nNúmero de Sentenças com Erros:', line_errors)
+    print("\n---------------- Sentenças -----------------\n")
+    print('Número de Sentenças com Erros:', line_errors)
     print("Porcentagem de Sentenças com Erros: %.2f%%" % (line_errors/n_lines * 100))
     print('\nErros por Sentença:\n')
     media_de_erros_por_sentenca = 0
     maior_erro_em_uma_sentenca = 0
 
     for r in range(n_sentences):
-        id = ' - %.2d' % errors_per_line[r]
+        id = ' - %.3d' % errors_per_line[r]
         media_de_erros_por_sentenca += errors_per_line[r]
         if errors_per_line[r] > maior_erro_em_uma_sentenca:
             maior_erro_em_uma_sentenca = errors_per_line[r]
@@ -114,11 +116,12 @@ def main(variaveis):
     media_de_erros_por_sentenca //= n_sentences
     print('\nMaior Erro em uma Sentença:', maior_erro_em_uma_sentenca)
     print('Média de Erros por Sentença:', media_de_erros_por_sentenca)
-    print("Porcentagem Média de Erros por Sentença: %.2f%%" % (media_de_erros_por_sentenca/(n_variaveis) * 100), end='\n\n')
+    print("Porcentagem Média de Erros por Sentença: %.2f%%" % (media_de_erros_por_sentenca/(n_variaveis) * 100))
     col_errors = 0
     for i in errors_per_col:
         col_errors += int(i > 0)
-    print('\nNúmero de Variáveis com Erros:', col_errors)
+    print("\n--------------- Variáveis ----------------\n")
+    print('Número de Variáveis com Erros:', col_errors)
     print("Porcentagem de Variáveis com Erros: %.2f%%" % (col_errors/n_variaveis * 100))
     print('\nErros por Variável:\n')
     media_de_erros_por_variavel = 0
