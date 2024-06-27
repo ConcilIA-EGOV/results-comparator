@@ -9,7 +9,7 @@ def count_frequencies(df0: pd.DataFrame, times: int, index:int, draws:int) -> pd
     freq_row = freq_row._append(pd.Series(), ignore_index=True)
     
     for c in df0.columns:
-        if c == 'Sentença':
+        if c == 'sentença':
             freq_row[c] = df0.iloc[index][c]
             continue
             
@@ -34,7 +34,7 @@ def count_frequencies(df0: pd.DataFrame, times: int, index:int, draws:int) -> pd
             elif freq == max_freq:
                 draws += 1
 
-        if c[:9] == "intervalo" or c[:9] == "Intervalo":
+        if c[:9] == "intervalo":
             try:
                 frequent_value = round(float(frequent_value), 2)
             except:
@@ -51,7 +51,7 @@ def get_average_sheet(df0: pd.DataFrame) -> pd.DataFrame:
     draws = 0
     
     for index, row in df0.iterrows():
-        if sentence != row['Sentença']:
+        if sentence != row['sentença']:
             # nova sentença
             if times > 0:
                 # Quando mudar de sentença, o times terá
@@ -59,7 +59,7 @@ def get_average_sheet(df0: pd.DataFrame) -> pd.DataFrame:
                 freq_row, draws = count_frequencies(df0, times, index-1, draws) 
                 df_out = df_out._append(freq_row, ignore_index=True)
             
-            sentence = row['Sentença']
+            sentence = row['sentença']
             # times é reiniciado para a próxima sentença
             times = 1
             

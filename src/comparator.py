@@ -2,15 +2,12 @@ import pandas as pd
 import openpyxl
 import modulator as md
 
-
-VARIAVEIS = ["Sentença", "direito de arrependimento", "descumprimento de oferta", "extravio definitivo", "extravio temporário", "intervalo de extravio", "violação", "cancelamento (sem realocação)/alteração de destino", "atraso de voo", "intervalo de atraso", "culpa exclusiva do consumidor", "inoperabilidade do aeroporto", "no show", "overbooking", "assistência da companhia aérea", "hipervulnerabilidade"]
-
 ARQUIVO_DE_SAIDA = 'Resultados/resultado.xlsx'
 SOURCE = 'tables/source.xlsx'
 TEST = 'tables/test.xlsx'
 
 # Receives 2 excel sheets and compares them
-def compare(df1: pd.DataFrame, df2: pd.DataFrame) -> (int, int, [int], [int]):
+def compare(df1: pd.DataFrame, df2: pd.DataFrame) -> tuple[int, int, list[int], list[int]]:
 
     # receiving dataframes sizes
     num_rows1, num_cols1 = df1.shape
@@ -69,11 +66,14 @@ def compare(df1: pd.DataFrame, df2: pd.DataFrame) -> (int, int, [int], [int]):
 
     return total_errors, line_errors, col_errors, errors_per_line
 
-def main(variaveis):
+def main():
     # Lê arquivos
     df1 = pd.read_excel(SOURCE)
+    # df2 = pd.read_excel(TEST)
     df_temp = pd.read_excel(TEST)
     df2, draws = md.get_average_sheet(df_temp)
+    if draws > 0:
+        print("Número de Empates:", draws)
 
     # Compara arquivos
     (total_errors, line_errors, errors_per_col, errors_per_line) = compare(df1, df2)
@@ -90,8 +90,6 @@ def main(variaveis):
     print("Número de Sentenças:", n_sentences)
     print("Número de Variáveis:", n_variaveis)
     print("Número Total de Valores:", total_values)
-    if draws > 0:
-        print("Número de Empates:", draws)
 
     # Imprime resultados
     print('\nNúmero Total de Erros:', total_errors)
@@ -126,6 +124,7 @@ def main(variaveis):
     print('\nErros por Variável:')
     media_de_erros_por_variavel = 0
     maior_erro_em_uma_variavel = 0
+    variaveis = df1.columns
     for i in range(1, n_variaveis + 1):
         id = (" %.2d" % i) + (' - %.3d' % errors_per_col[i])
         media_de_erros_por_variavel += errors_per_col[i]
@@ -145,4 +144,5 @@ def main(variaveis):
     print("Porcentagem Média de Erros por Variável: %.2f%%" % (media_de_erros_por_variavel/n_lines * 100))
     return 0
 
-main(VARIAVEIS)
+if __name__ == '__main__':
+    main()
