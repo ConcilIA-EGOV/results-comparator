@@ -56,6 +56,8 @@ def format_intervalo(value, interval_values=[]):
         value = format_comma_strings(value)
     elif ':' in value:
         value = hour_to_float(value)
+    elif '.' in value:
+        value = float(value)
     else:
         print("Valor não reconhecido:", value)
         return value
