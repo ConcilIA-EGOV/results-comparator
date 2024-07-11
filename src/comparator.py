@@ -1,6 +1,7 @@
 import pandas as pd
 import openpyxl
 import modulator as md
+import variable_formatation as vf
 
 ARQUIVO_DE_SAIDA = 'Resultados/resultado.xlsx'
 SOURCE = 'tables/source.xlsx'
@@ -68,13 +69,13 @@ def compare(df1: pd.DataFrame, df2: pd.DataFrame) -> tuple[int, int, list[int], 
 
 def main():
     # Lê arquivos
-    df1 = pd.read_excel(SOURCE)
+    df1 = vf.format_data(SOURCE)
+    df2 = vf.format_data(TEST)
     # df2 = pd.read_excel(TEST)
-    df_temp = pd.read_excel(TEST)
-    df2, draws = md.get_average_sheet(df_temp)
-    if draws > 0:
-        print("Número de Empates:", draws)
-
+    # df2, draws = md.get_average_sheet(df_temp)
+    #    if draws > 0:
+    #        print("Número de Empates:", draws)
+    
     # Compara arquivos
     (total_errors, line_errors, errors_per_col, errors_per_line) = compare(df1, df2)
 
