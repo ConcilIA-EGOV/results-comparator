@@ -23,7 +23,7 @@ DATA_VARS_RANGE = [
     'hipervulnerável',
     'faixa_dano_moral_individual'
 ]
-FAIXAS_EXTRAVIO = [24, 72, 168]
+FAIXAS_EXTRAVIO = [1, 24, 72, 168]
 FAIXAS_ATRASO = [1, 4, 8, 12, 16, 24, 28]
 FAIXAS_DANO = [1, 2000, 4000, 6000, 8000, 10000]
 
