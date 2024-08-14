@@ -1,9 +1,7 @@
 # caminhos para os arquivos de dados e modelos
-FILE_PATH = "data/Teste.csv"
-RESULT_FILE_PATH = "data/result.csv"
-MODEL_PATH = "models_storage/"
-MAIN_MODEL_FILE = MODEL_PATH + "main_model.joblib"
-BEST_SCORE_STORAGE = MODEL_PATH + "best_scores.json"
+ARQUIVO_DE_SAIDA = 'Resultados/resultado.xlsx'
+SOURCE = 'tables/source.xlsx'
+TEST = 'tables/test.xlsx'
 
 
 # Variáveis categorizadas
@@ -46,10 +44,10 @@ DATA_VARS_CONTINUOUS = [
 ]
 
 USE_RANGES = True
+CREATE_RANGES = False
 PREP = False
 REFIT = False
-# DATA_VARS = DATA_VARS_CONTINUOUS
-DATA_VARS = DATA_VARS_RANGE
+DATA_VARS = DATA_VARS_RANGE if USE_RANGES else DATA_VARS_CONTINUOUS
 
 ##############
 # Parâmetros #

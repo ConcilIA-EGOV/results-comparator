@@ -2,24 +2,24 @@ import pandas as pd
 import openpyxl
 import modulator as md
 import variable_formatation as vf
-
-ARQUIVO_DE_SAIDA = 'Resultados/resultado.xlsx'
-SOURCE = 'tables/source.xlsx'
-TEST = 'tables/test.xlsx'
+from parameters import SOURCE, TEST, ARQUIVO_DE_SAIDA
 
 # Receives 2 excel sheets and compares them
-def compare(df1: pd.DataFrame, df2: pd.DataFrame) -> tuple[int, int, list[int], list[int]]:
+def compare(df1: pd.DataFrame, df2: pd.DataFrame
+            ) -> tuple[int, int, list[int], list[int]]:
 
     # receiving dataframes sizes
     num_rows1, num_cols1 = df1.shape
     num_rows2, num_cols2 = df2.shape
     
     if num_cols1 != num_cols2:
-        print('Número de colunas diferentes', num_cols1, num_cols2)
+        print('Número de colunas diferentes',
+              num_cols1, num_cols2)
         return -1, -1, [-1], [-1]
 
     if (num_rows1) != num_rows2:
-        print('Número de linhas diferentes', num_rows1, num_rows2)
+        print('Número de linhas diferentes',
+              num_rows1, num_rows2)
         return -2, -2, [-2], [-2]
 
     total_errors = 0
@@ -28,7 +28,8 @@ def compare(df1: pd.DataFrame, df2: pd.DataFrame) -> tuple[int, int, list[int], 
     errors_per_line = [0 for i in range(num_rows1)]
     
     # opens the excel file to write the results
-    writer = pd.ExcelWriter(ARQUIVO_DE_SAIDA, engine='openpyxl')
+    writer = pd.ExcelWriter(ARQUIVO_DE_SAIDA,
+                            engine='openpyxl')
     book = writer.book
     
     # Obtém a planilha para poder alterar cores
