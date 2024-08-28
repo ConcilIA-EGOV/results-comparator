@@ -28,7 +28,7 @@ def hour_to_float(value):
     f_value = hours + minutes
     return f_value
 
-def format_string(value, interval_values=[]):
+def format_string(value):
     if '$' in value:
         value = value.replace('R$ ', '')
     if ',' in value:
@@ -79,24 +79,24 @@ def format_intervalo(value, interval_values=[]):
     return generate_range(value, interval_values)
 
 FUNCTIONS = {
-    'sentença': lambda x: x,
+    'sentenca': lambda x: x,
     'direito_de_arrependimento': lambda x: format_binario(x),
     'descumprimento_de_oferta': lambda x: format_binario(x),
     'extravio_definitivo': lambda x: format_binario(x),
-    'extravio_temporário': lambda x: format_binario(x),
-    'intervalo_extravio_temporário': lambda x: format_intervalo(x, FAIXAS_EXTRAVIO),
-    'faixa_intervalo_extravio_temporário': lambda x: int(x),
-    'violação_furto_avaria': lambda x: format_binario(x),
-    'cancelamento/alteração_destino': lambda x: format_binario(x),
+    'extravio_temporario': lambda x: format_binario(x),
+    'intervalo_extravio_temporario': lambda x: format_intervalo(x, FAIXAS_EXTRAVIO),
+    'faixa_intervalo_extravio_temporario': lambda x: int(x),
+    'violacao_furto_avaria': lambda x: format_binario(x),
+    'cancelamento/alteracao_destino': lambda x: format_binario(x),
     'atraso': lambda x: format_binario(x),
     'intervalo_atraso': lambda x: format_intervalo(x, FAIXAS_ATRASO),
     'faixa_intervalo_atraso': lambda x: int(x),
     'culpa_exclusiva_consumidor': lambda x: format_binario(x),
-    'condições_climáticas/fechamento_aeroporto': lambda x: format_binario(x),
+    'condicoes_climaticas/fechamento_aeroporto': lambda x: format_binario(x),
     'noshow': lambda x: format_binario(x),
     'overbooking': lambda x: format_binario(x),
-    'assistência_cia_aérea': lambda x: format_binario(x, -1),
-    'hipervulnerável': lambda x: format_binario(x),
+    'assistencia_cia_aerea': lambda x: format_binario(x, -1),
+    'hipervulneravel': lambda x: format_binario(x),
     'dano_moral_individual': lambda x: format_intervalo(x, FAIXAS_DANO),
     'faixa_dano_moral_individual': lambda x: int(x)
 }
@@ -106,8 +106,8 @@ def format_data(excel_file:str):
     # Aplicar a função de reformatação aos valores float nas colunas
     for coluna in df.columns:
         df[coluna] = df[coluna].apply(FUNCTIONS[coluna])
-    new_file = excel_file.replace(".xlsx", "__NEW.csv")
-    df.to_csv(new_file, index=False)
+    # new_file = excel_file.replace(".xlsx", "__NEW.csv")
+    # df.to_csv(new_file, index=False)
     return df
 
 
@@ -117,18 +117,6 @@ def trim_columns(df: pd.DataFrame):
     """
     remove_columns = [col for col in df.columns if col not in DATA_VARS]
     df = df.drop(columns=remove_columns)
-    results_columns = "dano_moral_individual"
-    if USE_RANGES:
-        results_columns = "faixa_dano_moral_individual"
-    target_column = df.columns.get_loc(results_columns)
-    if target_column != df.shape[1] - 1:
-        # Mover a coluna alvo para a última posição
-        tc = df.columns[target_column]
-        x1 = list(df.columns[:target_column])
-        x2 = list(df.columns[target_column + 1:])
-        new_cols = x1 + x2 + [tc]
-        df = df[new_cols]
-
     return df
 
 if __name__ == "__main__":

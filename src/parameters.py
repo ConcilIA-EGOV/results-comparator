@@ -9,17 +9,18 @@ DATA_VARS_RANGE = [
     'direito_de_arrependimento',
     'descumprimento_de_oferta',
     'extravio_definitivo',
-    'faixa_intervalo_extravio_temporário',
-    'violação_furto_avaria',
-    'cancelamento/alteração_destino',
+    'extravio_temporario',
+    'faixa_intervalo_extravio_temporario',
+    'violacao_furto_avaria',
+    'cancelamento/alteracao_destino',
+    'atraso',
     'faixa_intervalo_atraso',
     'culpa_exclusiva_consumidor',
-    'condições_climáticas/fechamento_aeroporto',
+    'condicoes_climaticas/fechamento_aeroporto',
     'noshow',
     'overbooking',
-    'assistência_cia_aérea',
-    'hipervulnerável',
-    'faixa_dano_moral_individual'
+    'assistencia_cia_aerea',
+    'hipervulneravel'
 ]
 FAIXAS_EXTRAVIO = [1, 24, 72, 168]
 FAIXAS_ATRASO = [1, 4, 8, 12, 16, 24, 28]
@@ -30,17 +31,18 @@ DATA_VARS_CONTINUOUS = [
     'direito_de_arrependimento',
     'descumprimento_de_oferta',
     'extravio_definitivo',
-    'intervalo_extravio_temporário',
-    'violação_furto_avaria',
-    'cancelamento/alteração_destino',
+    'extravio_temporario',
+    'intervalo_extravio_temporario',
+    'violacao_furto_avaria',
+    'cancelamento/alteracao_destino',
+    'atraso',
     'intervalo_atraso',
     'culpa_exclusiva_consumidor',
-    'condições_climáticas/fechamento_aeroporto',
+    'condicoes_climaticas/fechamento_aeroporto',
     'noshow',
     'overbooking',
-    'assistência_cia_aérea',
-    'hipervulnerável',
-    'dano_moral_individual'
+    'assistencia_cia_aerea',
+    'hipervulneravel'
 ]
 
 USE_RANGES = True
@@ -49,26 +51,122 @@ PREP = False
 REFIT = False
 DATA_VARS = DATA_VARS_RANGE if USE_RANGES else DATA_VARS_CONTINUOUS
 
-##############
-# Parâmetros #
-##############
+ATRASO1 = [
+    'direito_de_arrependimento',
+    'descumprimento_de_oferta',
+    'extravio_definitivo',
+    'extravio_temporario',
+    'intervalo_extravio_temporario',
+    'violacao_furto_avaria',
+    'cancelamento/alteracao_destino',
+    'atraso',
+    'intervalo_atraso',
+    'culpa_exclusiva_consumidor',
+    'condicoes_climaticas/fechamento_aeroporto',
+    'noshow',
+    'overbooking',
+    'assistencia_cia_aerea',
+    'hipervulneravel'
+]
 
-# Número de épocas
-NUM_EPOCHS = 100
-# Número de folds para a validação cruzada
-CV = 5
-# Tamanho do conjunto de teste
-TEST_SIZE = 0.3
+ATRASO2 = [
+    'direito_de_arrependimento',
+    'descumprimento_de_oferta',
+    'extravio_definitivo',
+    'extravio_temporario',
+    'intervalo_extravio_temporario',
+    'violacao_furto_avaria',
+    'atraso',
+    'intervalo_atraso',
+    'culpa_exclusiva_consumidor',
+    'condicoes_climaticas/fechamento_aeroporto',
+    'noshow',
+    'overbooking',
+    'assistencia_cia_aerea',
+    'hipervulneravel'
+]
 
-"""
-# pytorch parameters
-# Número de características
-INPUT_SIZE = 13
-# Número de classes
-OUTPUT_SIZE = 5
-# Taxa de aprendizado
-LR = 0.001
-# Tamanho do lote
-BATCH_SIZE = 32
-PYTORCH_MODEL_FILE = MODEL_PATH + "model.pth"
-"""
+ATRASO3 = [
+    'direito_de_arrependimento',
+    'descumprimento_de_oferta',
+    'extravio_definitivo',
+    'extravio_temporario',
+    'intervalo_extravio_temporario',
+    'violacao_furto_avaria',
+    'atraso',
+    'intervalo_atraso',
+    'culpa_exclusiva_consumidor',
+    'condicoes_climaticas/fechamento_aeroporto',
+    'noshow',
+    'overbooking',
+    'assistencia_cia_aerea',
+    'hipervulneravel'
+]
+
+ATRASO4 = [
+    'direito_de_arrependimento',
+    'descumprimento_de_oferta',
+    'extravio_definitivo',
+    'extravio_temporario',
+    'intervalo_extravio_temporario',
+    'violacao_furto_avaria',
+    'atraso',
+    'intervalo_atraso',
+    'culpa_exclusiva_consumidor',
+    'condicoes_climaticas/fechamento_aeroporto',
+    'noshow',
+    'overbooking',
+    'assistencia_cia_aerea',
+    'hipervulneravel'
+]
+
+ATRASO5 = [
+    'direito_de_arrependimento',
+    'descumprimento_de_oferta',
+    'extravio_definitivo',
+    'extravio_temporario',
+    'intervalo_extravio_temporario',
+    'violacao_furto_avaria',
+    'intervalo_atraso',
+    'culpa_exclusiva_consumidor',
+    'condicoes_climaticas/fechamento_aeroporto',
+    'noshow',
+    'overbooking',
+    'assistencia_cia_aerea',
+    'hipervulneravel'
+]
+
+EXTRAVIO1 = [
+    'direito_de_arrependimento',
+    'descumprimento_de_oferta',
+    'extravio_definitivo',
+    'extravio_temporario',
+    'intervalo_extravio_temporario',
+    'violacao_furto_avaria',
+    'cancelamento/alteracao_destino',
+    'atraso',
+    'intervalo_atraso',
+    'culpa_exclusiva_consumidor',
+    'condicoes_climaticas/fechamento_aeroporto',
+    'noshow',
+    'overbooking',
+    'assistencia_cia_aerea',
+    'hipervulneravel'
+]
+
+EXTRAVIO2 = [
+    'direito_de_arrependimento',
+    'descumprimento_de_oferta',
+    'extravio_definitivo',
+    'intervalo_extravio_temporario',
+    'violacao_furto_avaria',
+    'cancelamento/alteracao_destino',
+    'atraso',
+    'intervalo_atraso',
+    'culpa_exclusiva_consumidor',
+    'condicoes_climaticas/fechamento_aeroporto',
+    'noshow',
+    'overbooking',
+    'assistencia_cia_aerea',
+    'hipervulneravel'
+]
