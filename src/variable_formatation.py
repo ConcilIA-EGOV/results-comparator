@@ -101,16 +101,6 @@ FUNCTIONS = {
     'faixa_dano_moral_individual': lambda x: int(x)
 }
 
-def format_data(excel_file:str):
-    df = pd.read_excel(excel_file, engine='openpyxl')
-    # Aplicar a função de reformatação aos valores float nas colunas
-    for coluna in df.columns:
-        df[coluna] = df[coluna].apply(FUNCTIONS[coluna])
-    # new_file = excel_file.replace(".xlsx", "__NEW.csv")
-    # df.to_csv(new_file, index=False)
-    return df
-
-
 def trim_columns(df: pd.DataFrame):
     """
     Remove colunas não relacionadas ao experimento
@@ -118,6 +108,18 @@ def trim_columns(df: pd.DataFrame):
     remove_columns = [col for col in df.columns if col not in DATA_VARS]
     df = df.drop(columns=remove_columns)
     return df
+
+def format_data(excel_file:str):
+    df = pd.read_excel(excel_file, engine='openpyxl')
+    # Remover colunas não relacionadas ao experimento
+    df = trim_columns(df)
+    # Aplicar a função de reformatação aos valores float nas colunas
+    for coluna in df.columns:
+        df[coluna] = df[coluna].apply(FUNCTIONS[coluna])
+    # new_file = excel_file.replace(".xlsx", "__NEW.csv")
+    # df.to_csv(new_file, index=False)
+    return df
+
 
 if __name__ == "__main__":
     try:
