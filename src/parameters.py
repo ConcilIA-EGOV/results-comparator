@@ -6,6 +6,7 @@ TEST = 'tables/test.xlsx'
 
 USE_RANGES = True
 CREATE_RANGES = True
+ERROS_POR_SENTENCA = False
 
 # Variáveis categorizadas
 DATA_VARS_RANGE = [
