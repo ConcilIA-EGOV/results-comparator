@@ -2,19 +2,10 @@ import datetime
 import numpy as np
 import pandas as pd
 from parameters import FAIXAS_EXTRAVIO, FAIXAS_ATRASO, FAIXAS_DANO
-from parameters import DATA_VARS, USE_RANGES, CREATE_RANGES
+from parameters import DATA_VARS, CREATE_RANGES, LOG_VAR
 # from parameters import SOURCE, TEST, ARQUIVO_DE_SAIDA
-
-def generate_range(value, interval_values=[]):
-    if not CREATE_RANGES:
-        return value
-    if type(value) == str:
-        print("Valor não reconhecido ao criar faixas:", value)
-        return value
-    for i, interval in enumerate(interval_values):
-        if value < interval:
-            return i
-    return len(interval_values)
+LOG_ENABLED = True
+log_file = open(LOG_VAR, 'w')
 
 def hour_to_float(value):
     splits = value.split(":")
@@ -23,7 +14,7 @@ def hour_to_float(value):
         minutes = float(splits[-last].strip()) / 60
         hours = float(splits[-(last + 1)].strip())
     except:
-        print("Valor não reconhecido ao converter para hora:", value)
+        log_file.write(f"Valor não reconhecido ao converter para hora: {value}\n")
         return 0
     f_value = hours + minutes
     return f_value
@@ -41,7 +32,7 @@ def format_string(value):
     try:
         f_value = float(value)   
     except:
-        print("Valor não reconhecido ao formatar string:", value)
+        log_file.write(f"Valor não reconhecido ao formatar string: {value}\n")
         return value
     return f_value
 
@@ -56,26 +47,39 @@ def format_binario(value, anomaly=0, yes=1, no=0):
     if value in ['-', '', ' ']:
         return anomaly
 
+def generate_range(value, interval_values=[]):
+    if not CREATE_RANGES:
+        return value
+    if type(value) != int and type(value) != float:
+        log_file.write(f"Valor não reconhecido ao criar faixas: {value}\n")
+        return value
+    if value == -1:
+        return -1
+    for i, interval in enumerate(interval_values):
+        if value < interval:
+            return i
+    return len(interval_values)
+
 def format_intervalo(value, interval_values=[]):
     if type(value) == int:
         pass
     elif type(value) == float:
         if np.isnan(value):
             value = 0
-    elif type(value) == datetime.time or type(value) == datetime.datetime:
-        value = float(value.hour + value.minute / 60)
     elif value in ['-', '', ' ', '--']:
         value = 0
     elif ':' in value:
         value = hour_to_float(value)
     elif ',' in value or '.' in value:
         value = format_string(value)
+    elif type(value) == str and value.isnumeric():
+        value = int(value)
     else:
         try:
             value = float(value)
         except:
-            print("Valor não reconhecido ao formatar intervalo:", value)
-            return value
+            log_file.write(f"Valor não reconhecido ao formatar intervalo: {value}\n")
+            return -2
     return generate_range(value, interval_values)
 
 FUNCTIONS = {
@@ -106,35 +110,40 @@ def trim_columns(df: pd.DataFrame):
     Remove colunas não relacionadas ao experimento
     """
     remove_columns = [col for col in df.columns if col not in DATA_VARS]
+    log_file.write(f"Colunas removidas: {remove_columns}\n")
     df = df.drop(columns=remove_columns)
+    log_file.write(f"Colunas restantes: {df.columns.to_list()}\n")
     return df
 
-def format_data(excel_file:str):
-    df = pd.read_excel(excel_file, engine='openpyxl')
+def format_data(csv_file:str):
+    df = pd.read_csv(csv_file)
+    log_file.write(f"Arquivo: {csv_file}\n")
     # Remover colunas não relacionadas ao experimento
-    df = trim_columns(df)
+    try:
+        df = trim_columns(df)
+    except Exception as e:
+        log_file.write(str(e) + "\n")
+        log_file.write("Arquivo não encontrado ou mal formatado\n")
+        return df
     # Aplicar a função de reformatação aos valores float nas colunas
     for coluna in df.columns:
-        df[coluna] = df[coluna].apply(FUNCTIONS[coluna])
-    # new_file = excel_file.replace(".xlsx", "__NEW.csv")
-    # df.to_csv(new_file, index=False)
+        log_file.write(f"\n-----\nColuna: {coluna}\n")
+        try:
+            df[coluna] = df[coluna].apply(FUNCTIONS[coluna])
+        except Exception as e:
+            log_file.write(str(e) + '\n')
+            log_file.write(f"Erro ao formatar a coluna: {coluna}\n")
+    global LOG_ENABLED
+    LOG_ENABLED = not LOG_ENABLED
+    if LOG_ENABLED:
+        log_file.close()
     return df
 
 
 if __name__ == "__main__":
     try:
         csv_file = "tables/format.csv"
-        # Ler o arquivo CSV usando pandas
-        data = pd.read_csv(csv_file)
-        # Remover colunas não relacionadas ao experimento
-        data = trim_columns(data)
-        # Formatar os dados
-        # Aplicar a função de reformatação aos valores float nas colunas
-        for coluna in data.columns:
-            # print(coluna, '->', end=" ")
-            data[coluna] = data[coluna].apply(FUNCTIONS[coluna])
-            # print('ok')
-        # Salvar o DataFrame modificado de volta ao arquivo CSV
+        data = format_data(format_data)
         new_file = csv_file.replace(".csv", "__NEW.csv")
         data.to_csv(new_file, index=False)
     except Exception as e:
