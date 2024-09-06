@@ -1,6 +1,7 @@
 # Ignore changes in the Result folder
 Resultados/*.xlsx
-Resultados/log.txt
+Resultados/log_comparacao.txt
+Resultados/log_variables.txt
 
 # Ignore changes in the tables folder
 tables/*.xlsx
