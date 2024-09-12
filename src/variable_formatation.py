@@ -1,4 +1,3 @@
-import datetime
 import numpy as np
 import pandas as pd
 from parameters import FAIXAS_EXTRAVIO, FAIXAS_ATRASO, FAIXAS_DANO
