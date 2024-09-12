@@ -1,6 +1,5 @@
 import pandas as pd
 import openpyxl
-import modulator as md
 import variable_formatation as vf
 from parameters import SOURCE, TEST, ARQUIVO_DE_SAIDA
 
