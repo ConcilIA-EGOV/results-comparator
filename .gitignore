@@ -11,3 +11,4 @@ tables/*.csv
 .vscode/
 
 src/__pycache__
+.venv
