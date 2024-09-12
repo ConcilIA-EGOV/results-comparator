@@ -13,7 +13,7 @@ clean:
 	@rm -rf Resultados/*.txt
 
 clean_tables:
-	@rm -rf tables/*.xlsx
+	@rm -rf tables/*.csv
 
 make formating:
 	@python3 src/variable_formatation.py
