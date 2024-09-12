@@ -6,7 +6,6 @@ TEST = 'tables/test.csv'
 
 
 CREATE_RANGES = True
-ERROS_POR_SENTENCA = False
 
 FAIXAS_EXTRAVIO = [1, 24, 72, 168]
 FAIXAS_ATRASO = [1, 4, 8, 12, 16, 24, 28]

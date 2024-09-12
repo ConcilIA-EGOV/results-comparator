@@ -2,7 +2,7 @@ import pandas as pd
 import openpyxl
 import modulator as md
 import variable_formatation as vf
-from parameters import SOURCE, TEST, ARQUIVO_DE_SAIDA, ERROS_POR_SENTENCA
+from parameters import SOURCE, TEST, ARQUIVO_DE_SAIDA
 
 # Receives 2 excel sheets and compares them
 def compare(df1: pd.DataFrame, df2: pd.DataFrame
@@ -78,11 +78,9 @@ def print_results(total_errors, sentence_errors, errors_per_col,
     # Imprime resultados
     print('\nNúmero Total de Erros:', total_errors,
           '-->', "%.2f%%" % (total_errors/total_values * 100))
+    print("\n---------------- Sentenças -----------------\n")
     print('Número de Sentenças com Erros:', sentence_errors,
           '-->', "%.2f%%" % (sentence_errors/n_sentences * 100))
-    if ERROS_POR_SENTENCA:
-        print("\n---------------- Sentenças -----------------\n")
-        print('\nErros por Sentença:')
     media_de_erros_por_sentenca = 0
     maior_erro_em_uma_sentenca = 0
 
@@ -91,12 +89,6 @@ def print_results(total_errors, sentence_errors, errors_per_col,
         media_de_erros_por_sentenca += errors_per_line[r]
         if errors_per_line[r] > maior_erro_em_uma_sentenca:
             maior_erro_em_uma_sentenca = errors_per_line[r]
-        if ERROS_POR_SENTENCA:
-            number = (errors_per_line[r]/(n_variaveis) * 100)
-            num_int = int(number)
-            dec_num = round(number - num_int, 2)*100
-            resultado = 'erros, %.2d.%.2d%% de erro' % (number, dec_num)
-            print(id, resultado)
     media_de_erros_por_sentenca /= n_sentences
     print('Média de Erros por Sentença:', round(media_de_erros_por_sentenca, 2),
           ('--> %.2f%%' % (media_de_erros_por_sentenca/(n_variaveis) * 100)))
