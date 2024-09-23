@@ -5,8 +5,8 @@ all:
 	@echo "Digite make formating para formatar as variáveis"
 
 run:
-	@python3 src/comparator.py > Resultados/log_comparacao.txt
-	@cat Resultados/log_comparacao.txt
+	@python3 src/comparator.py > Resultados/resultado_comparacao.txt
+	@cat Resultados/resultado_comparacao.txt
 
 clean:
 	@rm -rf Resultados/*.xlsx
