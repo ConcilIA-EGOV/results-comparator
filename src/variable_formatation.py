@@ -41,9 +41,9 @@ def format_binario(value, anomaly=0, yes=1, no=0):
             return anomaly
     if value in ['S', 's', 'Y', 'y', 'Sim', 'sim', 'SIM', 'YES', 'Yes', 'yes', '1']:
         return yes
-    if value in ['N', 'n', 'Não', 'não', 'NÃO', 'NO', 'No', 'no', '0']:
+    elif value in ['N', 'n', 'Não', 'não', 'NÃO', 'NO', 'No', 'no', '0']:
         return no
-    if value in ['-', '', ' ']:
+    else:
         return anomaly
 
 def generate_range(value, interval_values=[]):
@@ -51,7 +51,7 @@ def generate_range(value, interval_values=[]):
         return value
     if type(value) != int and type(value) != float:
         log_file.write(f"Valor não reconhecido ao criar faixas: {value}\n")
-        return value
+        return -2
     if value == -1:
         return -1
     for i, interval in enumerate(interval_values):

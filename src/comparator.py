@@ -1,15 +1,22 @@
 import pandas as pd
 import openpyxl
+from collections import defaultdict
 import variable_formatation as vf
 from parameters import SOURCE, TEST, ARQUIVO_DE_SAIDA
+from value_comparation import COMPARISONS
+
+def fill_cell(df, row, col):
+    cell = df.cell(row=row+2, column=col+1)
+    cell.fill = openpyxl.styles.PatternFill(fgColor="FFFF00", fill_type = "solid")
+    
 
 # Receives 2 excel sheets and compares them
-def compare(df1: pd.DataFrame, df2: pd.DataFrame
+def compare(src: pd.DataFrame, dst: pd.DataFrame
             ) -> tuple[int, int, list[int], list[int]]:
 
     # receiving dataframes sizes
-    num_rows1, num_cols1 = df1.shape
-    num_rows2, num_cols2 = df2.shape
+    num_rows1, num_cols1 = src.shape
+    num_rows2, num_cols2 = dst.shape
     
     if num_cols1 != num_cols2:
         print('Número de colunas diferentes',
@@ -23,7 +30,8 @@ def compare(df1: pd.DataFrame, df2: pd.DataFrame
 
     total_errors = 0
     line_errors = 0
-    col_errors = [0 for i in range(num_cols1)]
+    col_errors = [0 for _ in range(num_cols1)]
+    var_errors = dict()
     errors_per_line = [0 for i in range(num_rows1)]
     
     # opens the excel file to write the results
@@ -37,38 +45,49 @@ def compare(df1: pd.DataFrame, df2: pd.DataFrame
         sheet = book.create_sheet('Sheet1')
 
     # Percorre as células comparando valores
-    for r1 in range(num_rows1):
-        for c in range(1, num_cols1):
-            v1 = df1.iloc[r1, c]
-            v2 = df2.iloc[r1, c]
-            if v1 != v2:
-                try:
-                    v2 = round(float(v2), 2)
-                    v1 = round(float(v1), 2)
-                    # Se for float, arredonda para 2 casas decimais
-                    if v1 == v2:
-                        continue
-                except:
-                    pass
-                errors_per_line[r1] += 1
-                cell = sheet.cell(row=r1+2, column=c+1)
-                cell.fill = openpyxl.styles.PatternFill(fgColor="FFFF00", fill_type = "solid")
-                total_errors += 1
+    names = src.columns
+    for c in range(1, num_cols1):
+        func = COMPARISONS[names[c]]
+        var_errors[names[c]] = defaultdict(int)
+        for r1 in range(num_rows1):
+            v1 = src.iloc[r1, c]
+            v2 = dst.iloc[r1, c]
+            result = func(v1, v2)
+            var_errors[names[c]][result] += 1
+            error = True
+            if type(result) == int:
+                if result == 0:
+                    error = False
+            else:
+                error = result != 'TP' and result != 'TN'
+            if error:
+                fill_cell(sheet, r1, c)
                 col_errors[c] += 1
-        if errors_per_line[r1] > 0:
-            cell = sheet.cell(row=r1+2, column=1)
-            cell.fill = openpyxl.styles.PatternFill(fgColor="FFFF00", fill_type = "solid")
-            line_errors += 1
+                errors_per_line[r1] += 1
+                total_errors += 1
+                if errors_per_line[r1] == 1:
+                    fill_cell(sheet, r1, 0)
+                    line_errors += 1
+        if any(type(i) == str for i in var_errors[names[c]].keys()):
+            if 'TP' not in var_errors[names[c]]:
+                var_errors[names[c]]['TP'] = 0
+            if 'TN' not in var_errors[names[c]]:
+                var_errors[names[c]]['TN'] = 0
+            if 'FP' not in var_errors[names[c]]:
+                var_errors[names[c]]['FP'] = 0
+            if 'FN' not in var_errors[names[c]]:
+                var_errors[names[c]]['FN'] = 0
             
 
     # Exporta o dataframe modificado
-    df2.to_excel(writer, index=False) 
+    dst.to_excel(writer, index=False) 
     writer._save()
 
-    return total_errors, line_errors, col_errors, errors_per_line
+    return total_errors, line_errors, col_errors, errors_per_line, var_errors
 
 def print_results(total_errors, sentence_errors, errors_per_col,
-                  errors_per_line, n_sentences, n_variaveis, variaveis):
+                  errors_per_line, n_sentences, n_variaveis,
+                  variaveis, var_errors):
     total_values = n_sentences * n_variaveis
     print("Nº de Sentenças:", n_sentences,
           "| Nº de Variáveis:", n_variaveis,
@@ -91,7 +110,6 @@ def print_results(total_errors, sentence_errors, errors_per_col,
     media_de_erros_por_variavel = 0
     maior_erro_em_uma_variavel = 0
     for i in range(1, n_variaveis + 1):
-        id = (" %.2d" % i) + (' - %.3d' % (n_sentences - errors_per_col[i]))
         media_de_erros_por_variavel += errors_per_col[i]
         if errors_per_col[i] > maior_erro_em_uma_variavel:
             maior_erro_em_uma_variavel = errors_per_col[i]
@@ -101,8 +119,19 @@ def print_results(total_errors, sentence_errors, errors_per_col,
         if dec_num == 100:
             dec_num = 0
             number += 1
-        resultado = '--> %.2d.%.2d%% de Acurácia' % (number, dec_num)
-        print(id, resultado, ':', variaveis[i])
+        resultado = 'Acertos: %.2d.%.2d%%' % (number, dec_num)
+        log = dict(var_errors[variaveis[i]])
+        log_str = ''
+        keys = list(log.keys())
+        keys.sort()
+        for key in keys:
+            str_key = str(key).rjust(2)
+            str_log = str(log[key]).rjust(3)
+            log_str += ' | ' + str_key + ': ' + str_log
+
+        # formats the variable name to fit 42 caracteres, filling with white spaces
+        var = ' ' + variaveis[i].ljust(41)
+        print(var, ':', resultado, log_str)
     media_de_erros_por_variavel //= n_variaveis
     print('\nMaior Número de Erros em uma Variável:',
           maior_erro_em_uma_variavel, '--> %.2f%%' %
@@ -128,7 +157,8 @@ def main():
     df2 = vf.format_data(TEST)
     
     # Compara arquivos
-    (total_errors, sentence_errors, errors_per_col, errors_per_line) = compare(df1, df2)
+    (total_errors, sentence_errors,
+     errors_per_col, errors_per_line, var_errors) = compare(df1, df2)
 
     if total_errors < 0:
         return -1
@@ -137,7 +167,9 @@ def main():
     n_variaveis -= 1
     variaveis = df1.columns
     print_results(total_errors, sentence_errors, errors_per_col,
-                  errors_per_line, n_sentences, n_variaveis, variaveis)
+                  errors_per_line, n_sentences, n_variaveis,
+                  variaveis, var_errors)
+#    print(var_errors)
     return 0
 
 if __name__ == '__main__':
