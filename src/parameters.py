@@ -1,6 +1,6 @@
 # caminhos para os arquivos de dados e modelos
 ARQUIVO_DE_SAIDA = 'Resultados/resultado.xlsx'
-LOG_VAR = 'Resultados/log_variables.txt'
+LOG_VAR = 'Resultados/debug.txt'
 SOURCE = 'tables/source.csv'
 TEST = 'tables/test.csv'
 
