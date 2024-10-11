@@ -85,76 +85,66 @@ def compare(src: pd.DataFrame, dst: pd.DataFrame
 
     return total_errors, line_errors, col_errors, errors_per_line, var_errors
 
+def get_percentage(value, total):
+    num = (1 - (value/total)) * 100
+    num_int = int(num)
+    dec_num = round(num - num_int, 2)*100
+    if dec_num == 100:
+        dec_num = 0
+        num += 1
+    return ('%.2d,%.2d%%' % (num, dec_num))
+
 def print_results(total_errors, sentence_errors, errors_per_col,
                   errors_per_line, n_sentences, n_variaveis,
-                  variaveis, var_errors):
+                  variaveis, var_errors, table_name="TESTE"):
     total_values = n_sentences * n_variaveis
-    print("Nº de Sentenças:", n_sentences,
-          "| Nº de Variáveis:", n_variaveis,
-          "| Nº Total de Valores:", total_values)
+    ac_total = get_percentage(total_errors, total_values)
+    ac_total_sent = get_percentage(sentence_errors, n_sentences)
+    csv_line = [table_name, "---", ac_total, ac_total_sent]
+
+    output = f"Nº de Sentenças: {n_sentences} | Nº de Variáveis: {n_variaveis} | Nº Total de Valores: {total_values}\n"
 
     # Imprime resultados
-    media_de_erros_por_sentenca = 0
-    maior_erro_em_uma_sentenca = 0
-
-    for r in range(n_sentences):
-        id = ' - %.3d' % errors_per_line[r]
-        media_de_erros_por_sentenca += errors_per_line[r]
-        if errors_per_line[r] > maior_erro_em_uma_sentenca:
-            maior_erro_em_uma_sentenca = errors_per_line[r]
-    media_de_erros_por_sentenca /= n_sentences
     col_errors = 0
     for i in errors_per_col:
         col_errors += int(i > 0)
-    print('\nAcurácia por Variável:')
+    output += ('\nAcurácia por Variável:\n')
     media_de_erros_por_variavel = 0
-    maior_erro_em_uma_variavel = 0
     for i in range(1, n_variaveis + 1):
         media_de_erros_por_variavel += errors_per_col[i]
-        if errors_per_col[i] > maior_erro_em_uma_variavel:
-            maior_erro_em_uma_variavel = errors_per_col[i]
-        number = (1 - (errors_per_col[i]/n_sentences)) * 100
-        num_int = int(number)
-        dec_num = round(number - num_int, 2)*100
-        if dec_num == 100:
-            dec_num = 0
-            number += 1
-        resultado = 'Acertos: %.2d.%.2d%%' % (number, dec_num)
+        ac = get_percentage(errors_per_col[i], n_sentences)
+        csv_line.append(ac)
+        resultado = 'Acertos: ' + ac
         log = dict(var_errors[variaveis[i]])
-        log_str = ''
+        log_str = ' | '
         keys = list(log.keys())
         keys.sort()
         for key in keys:
             str_key = str(key).rjust(2)
             str_log = str(log[key]).rjust(3)
-            log_str += ' | ' + str_key + ': ' + str_log
-
+            log_str += str_key + ': ' + str_log + ' | '
         # formats the variable name to fit 42 caracteres, filling with white spaces
-        var = ' ' + variaveis[i].ljust(41)
-        print(var, ':', resultado, log_str)
-    media_de_erros_por_variavel //= n_variaveis
-    print('\nMaior Número de Erros em uma Variável:',
-          maior_erro_em_uma_variavel, '--> %.2f%%' %
-          ((maior_erro_em_uma_variavel/n_sentences) * 100))
-    print('Maior nº de Erros em uma Sentença:', maior_erro_em_uma_sentenca,
-          ('--> %.2f%%' % (maior_erro_em_uma_sentenca/(n_variaveis) * 100)))
-    print("-------------------------------------------")
-    print('Acurácia Média das Variáveis: %.2f%%' %
-          ((1 - (media_de_erros_por_variavel/n_sentences)) * 100))
-    print('Acurácia Média das Sentenças: %.2f%%' %
-          ((1 - (media_de_erros_por_sentenca/n_variaveis)) * 100))
-    print("-------------------------------------------")
-    print('>> Acurácia Total das Variáveis: %.2f%%' %
-          ((1 - (col_errors/n_variaveis)) * 100))
-    print('>> Acurácia Total das Sentenças: %.2f%%' %
-          ((1 - (sentence_errors/n_sentences)) * 100))
-    print(">> Acurácia Total: %.2f%%" %
-          (100 - ((total_errors/total_values) * 100)))
-    
-def main():
+        output += ' ' + variaveis[i].ljust(41) + ' : ' + resultado + '\n' # + log_str + '\n'
+
+    # media_de_erros_por_sentenca = sum(errors_per_line)/n_sentences
+    # media_de_erros_por_variavel = sum(errors_per_col)//n_variaveis
+    # ac_med_var = get_percentage(media_de_erros_por_variavel , n_sentences)
+    # ac_med_sent = get_percentage(media_de_erros_por_sentenca, n_variaveis)
+    # output += ("-------------------------------------------\n")
+    # output += ('Acurácia Média das Variáveis: %s\n' % ac_med_var)
+    # output += ('Acurácia Média das Sentenças: %s\n' % ac_med_sent)
+    output += ("-------------------------------------------\n")
+    output += ('>> Acurácia Total das Sentenças: %s\n' % ac_total_sent)
+    output += (">> Acurácia Total: %s\n" % ac_total)
+    print(output, end='')
+    return csv_line
+
+import pandas as pd
+
+def main(source, test):
     # Lê arquivos
-    df1 = vf.format_data(SOURCE)
-    df2 = vf.format_data(TEST)
+    df1 = vf.format_data(source)
+    df2 = vf.format_data(test)
     
     # Compara arquivos
     (total_errors, sentence_errors,
@@ -166,11 +156,17 @@ def main():
     # Por causa da coluna com o id da sentença
     n_variaveis -= 1
     variaveis = df1.columns
-    print_results(total_errors, sentence_errors, errors_per_col,
+    
+    csv_line = print_results(total_errors, sentence_errors, errors_per_col,
                   errors_per_line, n_sentences, n_variaveis,
                   variaveis, var_errors)
-#    print(var_errors)
+    # print(var_errors)
+    # pd.DataFrame([csv_line]).to_csv('Resultados/acuracia.csv', mode='a', header=False, index=False)
+    csv_header = ['Prompt', 'Descrição', 'Acurácia Total', 'Acurácia por Sentença', *variaveis[1:]]
+    # print(csv_line)
+    pd.DataFrame([csv_line], columns=csv_header).to_csv('Resultados/acuracia.csv', mode='a', index=False)
+    
     return 0
 
 if __name__ == '__main__':
-    main()
+    main(SOURCE, TEST)
