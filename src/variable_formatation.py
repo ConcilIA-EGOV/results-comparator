@@ -3,7 +3,6 @@ import pandas as pd
 from parameters import FAIXAS_EXTRAVIO, FAIXAS_ATRASO, FAIXAS_DANO
 from parameters import DATA_VARS, CREATE_RANGES, LOG_VAR
 # from parameters import SOURCE, TEST, ARQUIVO_DE_SAIDA
-LOG_ENABLED = True
 log_file = open(LOG_VAR, 'w')
 
 def hour_to_float(value):
@@ -115,10 +114,10 @@ def trim_columns(df: pd.DataFrame):
     return df
 
 def format_data(csv_file:str):
-    df = pd.read_csv(csv_file)
-    log_file.write(f"Arquivo: {csv_file}\n")
     # Remover colunas não relacionadas ao experimento
     try:
+        df = pd.read_csv(csv_file)
+        log_file.write(f"Arquivo: {csv_file}\n")
         df = trim_columns(df)
     except Exception as e:
         log_file.write(str(e) + "\n")
@@ -132,10 +131,6 @@ def format_data(csv_file:str):
         except Exception as e:
             log_file.write(str(e) + '\n')
             log_file.write(f"Erro ao formatar a coluna: {coluna}\n")
-    global LOG_ENABLED
-    LOG_ENABLED = not LOG_ENABLED
-    if LOG_ENABLED:
-        log_file.close()
     return df
 
 

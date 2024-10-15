@@ -1,8 +1,9 @@
 # caminhos para os arquivos de dados e modelos
-ARQUIVO_DE_SAIDA = 'Resultados/resultado.xlsx'
-LOG_VAR = 'Resultados/debug.txt'
-SOURCE = 'tables/source.csv'
-TEST = 'tables/test.csv'
+RESULTADOS = 'Resultados/'
+ACURACIA = 'Resultados/acuracia.csv'
+LOG_VAR = 'Resultados/debug_comparacao.txt'
+SOURCE = 'tables/source/*.csv'
+TEST = 'tables/teste/*.csv'
 
 
 CREATE_RANGES = True
