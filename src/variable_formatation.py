@@ -47,12 +47,12 @@ def format_binario(value, anomaly=0, yes=1, no=0):
 
 def generate_range(value, interval_values=[]):
     if not CREATE_RANGES:
-        return value
+        return float(value)
     if type(value) != int and type(value) != float:
         log_file.write(f"Valor não reconhecido ao criar faixas: {value}\n")
-        return -2
+        return 0
     if value == -1:
-        return -1
+        return 0
     for i, interval in enumerate(interval_values):
         if value < interval:
             return i
@@ -71,13 +71,13 @@ def format_intervalo(value, interval_values=[]):
     elif ',' in value or '.' in value:
         value = format_string(value)
     elif type(value) == str and value.isnumeric():
-        value = int(value)
+        value = float(value)
     else:
         try:
             value = float(value)
         except:
             log_file.write(f"Valor não reconhecido ao formatar intervalo: {value}\n")
-            return -2
+            value = 0
     return generate_range(value, interval_values)
 
 FUNCTIONS = {

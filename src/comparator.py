@@ -55,13 +55,14 @@ def compare(src: pd.DataFrame, dst: pd.DataFrame, name=RESULTADOS
             v1 = src.iloc[r1, c]
             v2 = dst.iloc[r1, c]
             result = func(v1, v2)
-            var_errors[names[c]][result] += 1
-            error = True
-            if type(result) == int:
-                if result == 0:
-                    error = False
+            if type(result) == float:
+                error = result > 4
+                if type(var_errors[names[c]]) == defaultdict:
+                    var_errors[names[c]] = 0
+                var_errors[names[c]] += result
             else:
                 error = result != 'TP' and result != 'TN'
+                var_errors[names[c]][result] += 1
             if error:
                 fill_cell(sheet, r1, c)
                 col_errors[c-1] += 1
@@ -70,7 +71,7 @@ def compare(src: pd.DataFrame, dst: pd.DataFrame, name=RESULTADOS
                 if errors_per_line[r1] == 1:
                     fill_cell(sheet, r1, 0)
                     line_errors += 1
-        if any(type(i) == str for i in var_errors[names[c]].keys()):
+        if type(var_errors[names[c]]) == defaultdict:
             if 'TP' not in var_errors[names[c]]:
                 var_errors[names[c]]['TP'] = 0
             if 'TN' not in var_errors[names[c]]:
@@ -119,16 +120,20 @@ def print_results(total_errors, sentence_errors, errors_per_col,
         csv_line.append(ac)
         media_de_erros_por_variavel += errors_per_col[i]
         resultado = 'Acertos: ' + ac
-        log = dict(var_errors[variaveis[i]])
-        log_str = ' | '
-        keys = list(log.keys())
-        keys.sort()
-        for key in keys:
-            str_key = str(key).rjust(2)
-            str_log = str(log[key]).rjust(3)
-            log_str += str_key + ': ' + str_log + ' | '
+        log = var_errors[variaveis[i]]
+        log_str = ' |'
+        if type(log) != float:
+            keys = list(log.keys())
+            keys.sort()
+            for key in keys:
+                str_key = str(key).rjust(2)
+                str_log = str(log[key]).rjust(3)
+                log_str += ' ' + str_key + ': ' + str_log + ' |'
+        else:
+            log /= n_sentences
+            log_str += ' Erro Médio (horas): {} |'.format(round(log, 2))
         # formats the variable name to fit 42 caracteres, filling with white spaces
-        output += ' ' + variaveis[i].ljust(41) + ' : ' + resultado + '\n' # + log_str + '\n'
+        output += ' ' + variaveis[i].ljust(41) + ' : ' + resultado + log_str + '\n'
 
     # media_de_erros_por_sentenca = sum(errors_per_line)/n_sentences
     # media_de_erros_por_variavel = sum(errors_per_col)//n_variaveis

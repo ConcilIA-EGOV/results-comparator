@@ -22,8 +22,8 @@ def compare_binario(src, dst) -> str:
         if dst == -1:
             return 'TN'
 
-def compare_intervalo(src, dst) -> int:
-    return int(abs(src - dst))
+def compare_intervalo(src, dst) -> float:
+    return float(abs(src - dst))
 
 COMPARISONS = {
     'direito_de_arrependimento': lambda x, y: compare_binario(x, y),
