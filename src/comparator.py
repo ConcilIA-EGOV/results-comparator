@@ -113,8 +113,13 @@ def print_results(total_errors, sentence_errors, errors_per_col,
     var_idx = 0
     for i in range(n_variaveis):
         var_idx += 1
-        if variaveis[i] != DATA_VARS[var_idx]:
+        while variaveis[i] != DATA_VARS[var_idx]:
             csv_line.append('////')
+            if 'intervalo' in DATA_VARS[var_idx]:
+                csv_line.append('////')
+            else:
+                for _ in range(4):
+                    csv_line.append('////')
             var_idx += 1
         ac = get_percentage(errors_per_col[i], n_sentences)
         csv_line.append(ac)
@@ -125,13 +130,17 @@ def print_results(total_errors, sentence_errors, errors_per_col,
         if type(log) != float:
             keys = list(log.keys())
             keys.sort()
+            keys.reverse()
             for key in keys:
                 str_key = str(key).rjust(2)
-                str_log = str(log[key]).rjust(3)
+                val = log[key]
+                str_log = str(val).rjust(3)
+                csv_line.append(val)
                 log_str += ' ' + str_key + ': ' + str_log + ' |'
         else:
-            log /= n_sentences
-            log_str += ' Erro Médio (horas): {} |'.format(round(log, 2))
+            log = round(log/n_sentences, 2)
+            csv_line.append(log)
+            log_str += ' Erro Médio (horas): {} |'.format(log)
         # formats the variable name to fit 42 caracteres, filling with white spaces
         output += ' ' + variaveis[i].ljust(41) + ' : ' + resultado + log_str + '\n'
 
@@ -153,7 +162,7 @@ def main(source, test):
     df2 = vf.format_data(test)
     
     # Compara arquivos
-    name = teste.split('/')[-1].split('.')[0]
+    name = get_prompt_name(test)
     saida_excel = RESULTADOS + name
     # creates the folder if it doesn't exist
     os.makedirs(saida_excel, exist_ok=True)
@@ -178,31 +187,45 @@ def get_experiments():
     # gets all csv files on the folderds tables/sorce and tables/teste
     try:
         source = sorted(glob.glob(SOURCE))
-        test = sorted(glob.glob(TEST))
-        for s, t in zip(source, test):
+        teste = sorted(glob.glob(TEST))
+        for s, t in zip(source, teste):
             experiments.append((s, t))
     except Exception as e:
         print(e)
         print("Arquivos não encontrados")
     return experiments
 
-def get_prompt_name(file, ext='.txt'):
+def get_prompt_name(file):
     name = file.split('/')[-1].split('.')[0]
-    log = open(RESULTADOS + name + '/' + name + ext, 'w')
-    return name, log
+    return name
 
 
 if __name__ == '__main__':
     experimentos = []
     for src, teste in get_experiments():
         csv_line, log = main(src, teste)
-        name, log_file = get_prompt_name(teste)
+        name = get_prompt_name(teste)
+        log_file = open(RESULTADOS + name + '/' + name + '.txt', 'w')
         log_file.write(log)
-        print("\n##########################################################################\n",
-              log, end='')
+        log_file.close()
+        '''print("\n##########################################################################\n",
+              log, end='')'''
         experimentos.append([name, '-------'] + csv_line)
-
-    csv_header = ['Prompt', 'Descrição', 'Acurácia Total', 'Acurácia por Sentença', *DATA_VARS[1:]]
+    
+    vars = []
+    for i in DATA_VARS[1:]:
+        if 'intervalo' in i:
+            vars.append('AC - ' + i)
+            vars.append('Err-med (h) - ' + i)
+        else:
+            vars.append('AC - ' + i)
+            vars.append('TP - ' + i)
+            vars.append('TN - ' + i)
+            vars.append('FP - ' + i)
+            vars.append('FN - ' + i)  
+    
+    csv_header = ['Prompt', 'Descrição', 'Acurácia Total', 'Acurácia por Sentença'] + vars
+    print(experimentos)
     try:
         pd.DataFrame(experimentos, columns=csv_header).to_csv(ACURACIA, index=False)
     except Exception as e:

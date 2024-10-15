@@ -14,7 +14,7 @@ clean:
 	@rm -rf Resultados/*.csv
 
 clean_tables:
-	@rm -rf tables/*.csv
+	@rm -rf tables/*/*.csv
 
 make formating:
 	@python3 src/variable_formatation.py

@@ -116,8 +116,8 @@ def trim_columns(df: pd.DataFrame):
 def format_data(csv_file:str):
     # Remover colunas não relacionadas ao experimento
     try:
-        df = pd.read_csv(csv_file)
         log_file.write(f"Arquivo: {csv_file}\n")
+        df = pd.read_csv(csv_file)
         df = trim_columns(df)
     except Exception as e:
         log_file.write(str(e) + "\n")
