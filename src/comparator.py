@@ -132,10 +132,10 @@ def print_results(total_errors, sentence_errors, errors_per_col,
             keys.sort()
             keys.reverse()
             for key in keys:
-                str_key = str(key).rjust(2)
-                val = log[key]
+                val = get_percentage(abs(n_sentences - log[key]), n_sentences)
                 str_log = str(val).rjust(3)
                 csv_line.append(val)
+                str_key = str(key).rjust(2)
                 log_str += ' ' + str_key + ': ' + str_log + ' |'
         else:
             log = round(log/n_sentences, 2)
@@ -225,7 +225,6 @@ if __name__ == '__main__':
             vars.append('FN - ' + i)  
     
     csv_header = ['Prompt', 'Descrição', 'Acurácia Total', 'Acurácia por Sentença'] + vars
-    print(experimentos)
     try:
         pd.DataFrame(experimentos, columns=csv_header).to_csv(ACURACIA, index=False)
     except Exception as e:
