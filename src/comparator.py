@@ -88,14 +88,17 @@ def compare(src: pd.DataFrame, dst: pd.DataFrame, name=RESULTADOS
 
     return total_errors, line_errors, col_errors, errors_per_line, var_errors
 
-def get_percentage(value, total):
-    num = (1 - (value/total)) * 100
+def float_string(num):
     num_int = int(num)
     dec_num = round(num - num_int, 2)*100
     if dec_num == 100:
         dec_num = 0
         num += 1
-    return ('%.2d,%.2d%%' % (num, dec_num))
+    return ('%.2d,%.2d' % (num, dec_num))
+
+def get_percentage(value, total):
+    num = (1 - (value/total)) * 100
+    return float_string(num) + '%'
 
 def print_results(total_errors, sentence_errors, errors_per_col,
                   errors_per_line, n_sentences, n_variaveis,
@@ -138,9 +141,9 @@ def print_results(total_errors, sentence_errors, errors_per_col,
                 str_key = str(key).rjust(2)
                 log_str += ' ' + str_key + ': ' + str_log + ' |'
         else:
-            log = round(log/n_sentences, 2)
+            log = float_string(log/n_sentences)
             csv_line.append(log)
-            log_str += ' Erro Médio (horas): {} |'.format(log)
+            log_str += ' Erro Médio (horas): ' + log + ' |'
         # formats the variable name to fit 42 caracteres, filling with white spaces
         output += ' ' + variaveis[i].ljust(41) + ' : ' + resultado + log_str + '\n'
 
@@ -208,9 +211,11 @@ if __name__ == '__main__':
         log_file = open(RESULTADOS + name + '/' + name + '.txt', 'w')
         log_file.write(log)
         log_file.close()
-        '''print("\n##########################################################################\n",
-              log, end='')'''
         experimentos.append([name, '-------'] + csv_line)
+        # print("\n######################################",
+        #       "######################################\n",
+        #       log, end='')
+        # break
     
     vars = []
     for i in DATA_VARS[1:]:
