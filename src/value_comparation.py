@@ -1,29 +1,31 @@
 
-def compare_binario(src, dst) -> str:
+def compare_binario(src, dst):
     if src == 1:
         if dst == 1:
-            return 'TP'
+            return 'TP', False
         if dst == 0:
-            return 'FN'
+            return 'FN', True
         if dst == -1:
-            return 'FN'
+            return 'FN', True
     if src == 0:
         if dst == 1:
-            return 'FP'
+            return 'FP', True
         if dst == 0:
-            return 'TN'
+            return 'TN', False
         if dst == -1:
-            return 'FN'
+            return 'FN', True
     if src == -1:
         if dst == 1:
-            return 'FP'
+            return 'FP', True
         if dst == 0:
-            return 'FN'
+            return 'FN', True
         if dst == -1:
-            return 'TN'
+            return 'TN', False
 
-def compare_intervalo(src, dst) -> float:
-    return float(abs(src - dst))
+def compare_intervalo(src, dst):
+    margin = (src - dst)
+    erro = abs(margin) > 1
+    return float(margin**2), erro
 
 COMPARISONS = {
     'direito_de_arrependimento': lambda x, y: compare_binario(x, y),

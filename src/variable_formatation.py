@@ -1,9 +1,10 @@
 import numpy as np
 import pandas as pd
 from parameters import FAIXAS_EXTRAVIO, FAIXAS_ATRASO, FAIXAS_DANO
-from parameters import DATA_VARS, CREATE_RANGES, LOG_VAR
+from parameters import DATA_VARS, CREATE_RANGES
 # from parameters import SOURCE, TEST, ARQUIVO_DE_SAIDA
-log_file = open(LOG_VAR, 'w')
+from file_operations import log_file
+current_column = ""
 
 def hour_to_float(value):
     splits = value.split(":")
@@ -12,7 +13,8 @@ def hour_to_float(value):
         minutes = float(splits[-last].strip()) / 60
         hours = float(splits[-(last + 1)].strip())
     except:
-        log_file.write(f"Valor não reconhecido ao converter para hora: {value}\n")
+        global current_column
+        log_file.write(f"\nColuna: {current_column}: Valor não reconhecido: {value}\n")
         return 0
     f_value = hours + minutes
     return f_value
@@ -30,7 +32,8 @@ def format_string(value):
     try:
         f_value = float(value)   
     except:
-        log_file.write(f"Valor não reconhecido ao formatar string: {value}\n")
+        global current_column
+        log_file.write(f"\nColuna: {current_column}: Valor não reconhecido: {value}\n")
         return value
     return f_value
 
@@ -49,7 +52,8 @@ def generate_range(value, interval_values=[]):
     if not CREATE_RANGES:
         return float(value)
     if type(value) != int and type(value) != float:
-        log_file.write(f"Valor não reconhecido ao criar faixas: {value}\n")
+        global current_column
+        log_file.write(f"\nColuna: {current_column}: Valor não reconhecido: {value}\n")
         return 0
     if value == -1:
         return 0
@@ -76,7 +80,8 @@ def format_intervalo(value, interval_values=[]):
         try:
             value = float(value)
         except:
-            log_file.write(f"Valor não reconhecido ao formatar intervalo: {value}\n")
+            global current_column
+            log_file.write(f"\nColuna: {current_column}: Valor não reconhecido: {value}\n")
             value = 0
     return generate_range(value, interval_values)
 
@@ -110,13 +115,13 @@ def trim_columns(df: pd.DataFrame):
     remove_columns = [col for col in df.columns if col not in DATA_VARS]
     log_file.write(f"Colunas removidas: {remove_columns}\n")
     df = df.drop(columns=remove_columns)
-    log_file.write(f"Colunas restantes: {df.columns.to_list()}\n")
+    # log_file.write(f"Colunas restantes: {df.columns.to_list()}\n")
     return df
 
 def format_data(csv_file:str):
     # Remover colunas não relacionadas ao experimento
     try:
-        log_file.write(f"Arquivo: {csv_file}\n")
+        log_file.write(f"\n---\nArquivo: {csv_file}\n")
         df = pd.read_csv(csv_file)
         df = trim_columns(df)
     except Exception as e:
@@ -125,7 +130,8 @@ def format_data(csv_file:str):
         return df
     # Aplicar a função de reformatação aos valores float nas colunas
     for coluna in df.columns:
-        log_file.write(f"\n-----\nColuna: {coluna}\n")
+        global current_column
+        current_column = coluna
         try:
             df[coluna] = df[coluna].apply(FUNCTIONS[coluna])
         except Exception as e:

@@ -1,11 +1,11 @@
-import glob
-import os
 import pandas as pd
 import openpyxl
 from collections import defaultdict
+# from math import sqrt
 
 import variable_formatation as vf
-from parameters import SOURCE, TEST, RESULTADOS, DATA_VARS, ACURACIA
+from parameters import DATA_VARS, ACURACIA
+from file_operations import get_experiments, get_save_path, get_prompt_name, write_log
 from value_comparation import COMPARISONS
 
 def fill_cell(df, row, col):
@@ -14,7 +14,7 @@ def fill_cell(df, row, col):
     
 
 # Receives 2 excel sheets and compares them
-def compare(src: pd.DataFrame, dst: pd.DataFrame, name=RESULTADOS
+def compare(src: pd.DataFrame, dst: pd.DataFrame, name: str
             ) -> tuple[int, int, list[int], list[int]]:
 
     # receiving dataframes sizes
@@ -54,14 +54,12 @@ def compare(src: pd.DataFrame, dst: pd.DataFrame, name=RESULTADOS
         for r1 in range(num_rows1):
             v1 = src.iloc[r1, c]
             v2 = dst.iloc[r1, c]
-            result = func(v1, v2)
+            result, error = func(v1, v2)
             if type(result) == float:
-                error = result > 4
                 if type(var_errors[names[c]]) == defaultdict:
                     var_errors[names[c]] = 0
                 var_errors[names[c]] += result
             else:
-                error = result != 'TP' and result != 'TN'
                 var_errors[names[c]][result] += 1
             if error:
                 fill_cell(sheet, r1, c)
@@ -100,9 +98,9 @@ def get_percentage(value, total):
     num = (1 - (value/total)) * 100
     return float_string(num) + '%'
 
-def print_results(total_errors, sentence_errors, errors_per_col,
-                  errors_per_line, n_sentences, n_variaveis,
-                  variaveis, var_errors):
+def measure_results(total_errors, sentence_errors, errors_per_col,
+                    errors_per_line, var_errors, n_sentences,
+                    n_variaveis, variaveis):
     total_values = n_sentences * n_variaveis
     ac_total = get_percentage(total_errors, total_values)
     ac_total_sent = get_percentage(sentence_errors, n_sentences)
@@ -118,11 +116,12 @@ def print_results(total_errors, sentence_errors, errors_per_col,
         var_idx += 1
         while variaveis[i] != DATA_VARS[var_idx]:
             csv_line.append('////')
-            if 'intervalo' in DATA_VARS[var_idx]:
-                csv_line.append('////')
-            else:
-                for _ in range(4):
-                    csv_line.append('////')
+            csv_line.append('////')
+            # if 'intervalo' in DATA_VARS[var_idx]:
+            #     csv_line.append('////')
+            # else:
+            #     for _ in range(5):
+            #         csv_line.append('////')
             var_idx += 1
         ac = get_percentage(errors_per_col[i], n_sentences)
         csv_line.append(ac)
@@ -131,19 +130,28 @@ def print_results(total_errors, sentence_errors, errors_per_col,
         log = var_errors[variaveis[i]]
         log_str = ' |'
         if type(log) != float:
+            den = log['TP'] + log['FP']
+            precision = (log['TP']/den) if den != 0 else 0
+            den = log['TP'] + log['FN']
+            recall = (log['TP']/den) if den != 0 else 0
+            den = precision + recall
+            f1 = (2*(precision*recall)/den) if den != 0 else 0
+            f1 = float_string(f1)
+            csv_line.append(f1)
             keys = list(log.keys())
             keys.sort()
             keys.reverse()
             for key in keys:
                 val = get_percentage(abs(n_sentences - log[key]), n_sentences)
                 str_log = str(val).rjust(3)
-                csv_line.append(val)
+                # csv_line.append(val)
                 str_key = str(key).rjust(2)
                 log_str += ' ' + str_key + ': ' + str_log + ' |'
         else:
             log = float_string(log/n_sentences)
+            # log = sqrt(log)
             csv_line.append(log)
-            log_str += ' Erro Médio (horas): ' + log + ' |'
+            log_str += ' MSN (horas): ' + log + ' |'
         # formats the variable name to fit 42 caracteres, filling with white spaces
         output += ' ' + variaveis[i].ljust(41) + ' : ' + resultado + log_str + '\n'
 
@@ -159,75 +167,48 @@ def print_results(total_errors, sentence_errors, errors_per_col,
     output += (">> Acurácia Total: %s\n" % ac_total)
     return csv_line, output
 
-def main(source, test):
+def main(source, teste, saida_excel):
     # Lê arquivos
     df1 = vf.format_data(source)
-    df2 = vf.format_data(test)
+    df2 = vf.format_data(teste)
     
     # Compara arquivos
-    name = get_prompt_name(test)
-    saida_excel = RESULTADOS + name
-    # creates the folder if it doesn't exist
-    os.makedirs(saida_excel, exist_ok=True)
-    saida_excel += '/' + name + '.xlsx'
-    (total_errors, sentence_errors,
-     errors_per_col, errors_per_line, var_errors) = compare(df1, df2, saida_excel)
+    comparison = compare(df1, df2, saida_excel)
 
-    if total_errors < 0:
+    if comparison[0] < 0:
         return -1
     n_sentences= df1.shape[0]
     # Por causa da coluna da sentença
     variaveis = df1.columns[1:]
     n_variaveis = len(variaveis)
-    return print_results(total_errors, sentence_errors, errors_per_col,
-                  errors_per_line, n_sentences, n_variaveis,
-                  variaveis, var_errors)
-    # print(var_errors)
-
-
-def get_experiments():
-    experiments = []
-    # gets all csv files on the folderds tables/sorce and tables/teste
-    try:
-        source = sorted(glob.glob(SOURCE))
-        teste = sorted(glob.glob(TEST))
-        for s, t in zip(source, teste):
-            experiments.append((s, t))
-    except Exception as e:
-        print(e)
-        print("Arquivos não encontrados")
-    return experiments
-
-def get_prompt_name(file):
-    name = file.split('/')[-1].split('.')[0]
-    return name
-
+    return measure_results(*comparison, n_sentences, n_variaveis,
+                  variaveis)
 
 if __name__ == '__main__':
     experimentos = []
     for src, teste in get_experiments():
-        csv_line, log = main(src, teste)
+        saida_excel, log_file = get_save_path(teste)
+        csv_line, log = main(src, teste, saida_excel)
+        write_log(log_file, log)
         name = get_prompt_name(teste)
-        log_file = open(RESULTADOS + name + '/' + name + '.txt', 'w')
-        log_file.write(log)
-        log_file.close()
         experimentos.append([name, '-------'] + csv_line)
         # print("\n######################################",
-        #       "######################################\n",
-        #       log, end='')
+        #        "######################################\n",
+        #        log, end='')
         # break
     
     vars = []
     for i in DATA_VARS[1:]:
         if 'intervalo' in i:
             vars.append('AC - ' + i)
-            vars.append('Err-med (h) - ' + i)
+            vars.append('MSN (h) - ' + i)
         else:
             vars.append('AC - ' + i)
-            vars.append('TP - ' + i)
-            vars.append('TN - ' + i)
-            vars.append('FP - ' + i)
-            vars.append('FN - ' + i)  
+            vars.append('F1 - ' + i)
+            # vars.append('TP - ' + i)
+            # vars.append('TN - ' + i)
+            # vars.append('FP - ' + i)
+            # vars.append('FN - ' + i)  
     
     csv_header = ['Prompt', 'Descrição', 'Acurácia Total', 'Acurácia por Sentença'] + vars
     try:
