@@ -23,8 +23,8 @@ def compare_binario(src, dst):
             return 'TN', False
 
 def compare_intervalo(src, dst):
-    margin = (src - dst)
-    erro = abs(margin) > 1
+    margin = abs(src - dst)
+    erro = margin > 1
     return float(margin**2), erro
 
 COMPARISONS = {
@@ -32,6 +32,8 @@ COMPARISONS = {
     'descumprimento_de_oferta': lambda x, y: compare_binario(x, y),
     'extravio_definitivo': lambda x, y: compare_binario(x, y),
     'extravio_temporario': lambda x, y: compare_binario(x, y),
+    'faixa_intervalo_extravio_temporario': lambda x, y: compare_intervalo(x, y),
+    'faixa_intervalo_atraso': lambda x, y: compare_intervalo(x, y),
     'intervalo_extravio_temporario': lambda x, y: compare_intervalo(x, y),
     'violacao_furto_avaria': lambda x, y: compare_binario(x, y),
     'cancelamento/alteracao_destino': lambda x, y: compare_binario(x, y),

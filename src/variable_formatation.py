@@ -120,9 +120,11 @@ def trim_columns(df: pd.DataFrame):
 
 def format_data(csv_file:str):
     # Remover colunas não relacionadas ao experimento
+    result_col = None
     try:
         log_file.write(f"\n---\nArquivo: {csv_file}\n")
         df = pd.read_csv(csv_file)
+        result_col = df['dano_moral_individual']
         df = trim_columns(df)
     except Exception as e:
         log_file.write(str(e) + "\n")
@@ -137,6 +139,20 @@ def format_data(csv_file:str):
         except Exception as e:
             log_file.write(str(e) + '\n')
             log_file.write(f"Erro ao formatar a coluna: {coluna}\n")
+    np_array = df.to_numpy()
+    # makes a ortogonal projection of all variables
+    # to 2D space, using Pitagoras theorem
+    np_array = np_array**2
+    np_array = np_array.sum(axis=1)
+    np_array = np_array**0.5
+    # converts the values on result_col from money to float
+    result_col = result_col.apply(format_string)
+    # creates a new matrix with the ortogonal projection and the result
+    new_matrix = np.column_stack((np_array, result_col))
+    # writes the result to a new csv file
+    new_file = csv_file.replace(".csv", "__NEW.csv")
+    new_df = pd.DataFrame(new_matrix, columns=["Projecao-Ortogonal", "Dano-Moral"])
+    new_df.to_csv(new_file, index=False)
     return df
 
 

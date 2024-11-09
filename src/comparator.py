@@ -176,7 +176,7 @@ def main(source, teste, saida_excel):
     comparison = compare(df1, df2, saida_excel)
 
     if comparison[0] < 0:
-        return -1
+        return -1, -1
     n_sentences= df1.shape[0]
     # Por causa da coluna da sentença
     variaveis = df1.columns[1:]
@@ -189,6 +189,8 @@ if __name__ == '__main__':
     for src, teste in get_experiments():
         saida_excel, log_file = get_save_path(teste)
         csv_line, log = main(src, teste, saida_excel)
+        if csv_line == -1:
+            continue
         write_log(log_file, log)
         name = get_prompt_name(teste)
         experimentos.append([name, '-------'] + csv_line)

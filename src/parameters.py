@@ -29,15 +29,16 @@ DATA_VARS = [
     'noshow',
     'overbooking',
     'assistencia_cia_aerea',
-    'hipervulneravel'
+    'hipervulneravel',
 ]
 
 # Variáveis categorizadas
 DATA_VARS_RANGE = [
+    "sentenca",
     'direito_de_arrependimento',
     'descumprimento_de_oferta',
     'extravio_definitivo',
-    'intervalo_extravio_temporario',
+    'extravio_temporario',
     'faixa_intervalo_extravio_temporario',
     'violacao_furto_avaria',
     'cancelamento/alteracao_destino',
