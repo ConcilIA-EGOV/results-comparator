@@ -146,18 +146,20 @@ import matplotlib.pyplot as plt
 reads a csv file with 2 columns, Projecao-Ortogonal (x) and Dano-Moral (y),
 and plot a graphic comparing them 
 """
-def plot_graphic_from_csv(csv_file:str):
+def plot_graphic_from_csv(csv_file:str,
+                          col1:str,
+                          col2:str,
+                          title:str):
     data = pd.read_csv(csv_file)
-    x = data['Projecao-Ortogonal']
-    y = data['Dano-Moral']
+    x = data[col1]
+    y = data[col2]
     plt.scatter(x, y)
-    plt.xlabel('Projecao 2D')
-    plt.ylabel('Dano Moral')
-    plt.title('Comparação entre a projeção ortogonal e o dano moral')
+    plt.xlabel(col1)
+    plt.ylabel(col2)
+    plt.title(title)
     plt.show()
 
-def project_to_2d_space(df: pd.DataFrame, result_col: pd.DataFrame):
-    df = df.drop(columns=['sentenca'])
+def project_to_2d_space(df: pd.DataFrame):
     # converts the dataframe to a numpy array
     np_array = df.to_numpy()
     # makes a ortogonal projection of all variables
@@ -165,10 +167,7 @@ def project_to_2d_space(df: pd.DataFrame, result_col: pd.DataFrame):
     np_array = np_array**2
     np_array = np_array.sum(axis=1)
     np_array = np_array**0.5
-    # creates a new matrix with the ortogonal projection and the result
-    new_matrix = np.column_stack((np_array, result_col))
-    new_df = pd.DataFrame(new_matrix, columns=["Projecao-Ortogonal", "Dano-Moral"])
-    return new_df
+    return np_array
 
 
 if __name__ == "__main__":
@@ -179,15 +178,27 @@ if __name__ == "__main__":
         result_col = df['dano_moral_individual'].apply(format_string)
         # format the data
         df = format_data(csv_file)
+        df = df.drop(columns=['sentenca'])
         df.to_csv('projecao/formated.csv', index=False)
+        for col in df.columns:
+            np_array = df[col].to_numpy()
+            col = col.replace('/', '_')
+            proj_col = col
+            res_col = 'Dano-Moral'
+            new_file = 'projecao/{}.csv'.format(col)
+            title = "{} x {}".format(col, res_col)
+            # creates a new matrix with the ortogonal projection and the result
+            new_matrix = np.column_stack((np_array, result_col))
+            new_df = pd.DataFrame(new_matrix, columns=[proj_col, res_col])
+            # writes the result to a new csv file        
+            new_df.to_csv(new_file, index=False)
+            plot_graphic_from_csv(new_file, proj_col, res_col, title)
         # projects the data to 2D space
-        new_df = project_to_2d_space(df, result_col)
-        # writes the result to a new csv file
-        new_file = 'projecao/proj_dano.csv'
-        new_df.to_csv(new_file, index=False)
-        plot_graphic_from_csv(new_file)
+        np_array = project_to_2d_space(df)
+        new_matrix = np.column_stack((np_array, result_col))
+        new_df = pd.DataFrame(new_matrix, columns=['Projecao-Pitagoras', 'Dano-Moral'])
+        new_df.to_csv('projecao/Pitagoras.csv', index=False)
+        plot_graphic_from_csv('projecao/Pitagoras.csv', 'Projecao-Pitagoras', 'Dano-Moral', 'Projecao Pitagoras x Dano Moral')
     except Exception as e:
         print(e)
-        print("Arquivo não encontrado ou mal formatado,",
-              f"deveria chamar-se {csv_file}")
 
