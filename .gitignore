@@ -4,6 +4,7 @@ Resultados/*
 # Ignore changes in the tables folder
 tables/*/*.xlsx
 tables/*/*.csv
+projecao/*.csv
 
 # Ignore changes in the build folder
 .vscode/

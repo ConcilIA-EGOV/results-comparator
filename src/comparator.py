@@ -184,7 +184,7 @@ def main(source, teste, saida_excel):
     return measure_results(*comparison, n_sentences, n_variaveis,
                   variaveis)
 
-if __name__ == '__main__':
+def run_comparisons():
     experimentos = []
     for src, teste in get_experiments():
         saida_excel, log_file = get_save_path(teste)
@@ -218,4 +218,7 @@ if __name__ == '__main__':
     except Exception as e:
         print(e)
         print("Erro ao salvar os resultados")
-    
+
+if __name__ == '__main__':
+    run_comparisons()
+

@@ -25,16 +25,17 @@ def format_string(value):
     if ',' in value:
         value = value.replace(',', '.')
     if value[-3] == '.':
-        value = value[:-3]
-        if '.' in value:
-            value = value.replace('.', '')
-        return int(value)
+        if value[-3:] == '.00':
+            value = value[:-3]
+            if '.' in value:
+                value = value.replace('.', '')
+            return float(value)
     try:
         f_value = float(value)   
     except:
         global current_column
         log_file.write(f"\nColuna: {current_column}: Valor não reconhecido: {value}\n")
-        return value
+        return 0
     return f_value
 
 def format_binario(value, anomaly=0, yes=1, no=0):
@@ -120,11 +121,9 @@ def trim_columns(df: pd.DataFrame):
 
 def format_data(csv_file:str):
     # Remover colunas não relacionadas ao experimento
-    result_col = None
     try:
         log_file.write(f"\n---\nArquivo: {csv_file}\n")
         df = pd.read_csv(csv_file)
-        result_col = df['dano_moral_individual']
         df = trim_columns(df)
     except Exception as e:
         log_file.write(str(e) + "\n")
@@ -139,29 +138,54 @@ def format_data(csv_file:str):
         except Exception as e:
             log_file.write(str(e) + '\n')
             log_file.write(f"Erro ao formatar a coluna: {coluna}\n")
+    return df
+
+
+import matplotlib.pyplot as plt
+"""
+reads a csv file with 2 columns, Projecao-Ortogonal (x) and Dano-Moral (y),
+and plot a graphic comparing them 
+"""
+def plot_graphic_from_csv(csv_file:str):
+    data = pd.read_csv(csv_file)
+    x = data['Projecao-Ortogonal']
+    y = data['Dano-Moral']
+    plt.scatter(x, y)
+    plt.xlabel('Projecao 2D')
+    plt.ylabel('Dano Moral')
+    plt.title('Comparação entre a projeção ortogonal e o dano moral')
+    plt.show()
+
+def project_to_2d_space(df: pd.DataFrame, result_col: pd.DataFrame):
+    df = df.drop(columns=['sentenca'])
+    # converts the dataframe to a numpy array
     np_array = df.to_numpy()
     # makes a ortogonal projection of all variables
     # to 2D space, using Pitagoras theorem
     np_array = np_array**2
     np_array = np_array.sum(axis=1)
     np_array = np_array**0.5
-    # converts the values on result_col from money to float
-    result_col = result_col.apply(format_string)
     # creates a new matrix with the ortogonal projection and the result
     new_matrix = np.column_stack((np_array, result_col))
-    # writes the result to a new csv file
-    new_file = csv_file.replace(".csv", "__NEW.csv")
     new_df = pd.DataFrame(new_matrix, columns=["Projecao-Ortogonal", "Dano-Moral"])
-    new_df.to_csv(new_file, index=False)
-    return df
+    return new_df
 
 
 if __name__ == "__main__":
     try:
-        csv_file = "tables/format.csv"
-        data = format_data(format_data)
-        new_file = csv_file.replace(".csv", "__NEW.csv")
-        data.to_csv(new_file, index=False)
+        csv_file = 'projecao/full.csv'
+        df = pd.read_csv(csv_file)
+        # converts the values on result_col from money to float
+        result_col = df['dano_moral_individual'].apply(format_string)
+        # format the data
+        df = format_data(csv_file)
+        df.to_csv('projecao/formated.csv', index=False)
+        # projects the data to 2D space
+        new_df = project_to_2d_space(df, result_col)
+        # writes the result to a new csv file
+        new_file = 'projecao/proj_dano.csv'
+        new_df.to_csv(new_file, index=False)
+        plot_graphic_from_csv(new_file)
     except Exception as e:
         print(e)
         print("Arquivo não encontrado ou mal formatado,",
