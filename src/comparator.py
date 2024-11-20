@@ -4,7 +4,7 @@ from collections import defaultdict
 # from math import sqrt
 
 import variable_formatation as vf
-from parameters import DATA_VARS, ACURACIA
+from parameters import DATA_VARS, ACURACIA, GET_CONFUSION_MATRIX
 from file_operations import get_experiments, get_save_path, get_prompt_name, write_log
 from value_comparation import COMPARISONS
 
@@ -117,11 +117,10 @@ def measure_results(total_errors, sentence_errors, errors_per_col,
         while variaveis[i] != DATA_VARS[var_idx]:
             csv_line.append('////')
             csv_line.append('////')
-            # if 'intervalo' in DATA_VARS[var_idx]:
-            #     csv_line.append('////')
-            # else:
-            #     for _ in range(5):
-            #         csv_line.append('////')
+            if GET_CONFUSION_MATRIX:
+                if 'intervalo' not in DATA_VARS[var_idx]:
+                    for _ in range(4):
+                        csv_line.append('////')
             var_idx += 1
         ac = get_percentage(errors_per_col[i], n_sentences)
         csv_line.append(ac)
@@ -144,7 +143,8 @@ def measure_results(total_errors, sentence_errors, errors_per_col,
             for key in keys:
                 val = get_percentage(abs(n_sentences - log[key]), n_sentences)
                 str_log = str(val).rjust(3)
-                # csv_line.append(val)
+                if GET_CONFUSION_MATRIX:
+                    csv_line.append(val)
                 str_key = str(key).rjust(2)
                 log_str += ' ' + str_key + ': ' + str_log + ' |'
         else:
@@ -207,10 +207,11 @@ def run_comparisons():
         else:
             vars.append('AC - ' + i)
             vars.append('F1 - ' + i)
-            # vars.append('TP - ' + i)
-            # vars.append('TN - ' + i)
-            # vars.append('FP - ' + i)
-            # vars.append('FN - ' + i)  
+            if GET_CONFUSION_MATRIX:
+                vars.append('TP - ' + i)
+                vars.append('TN - ' + i)
+                vars.append('FP - ' + i)
+                vars.append('FN - ' + i)  
     
     csv_header = ['Prompt', 'Descrição', 'Acurácia Total', 'Acurácia por Sentença'] + vars
     try:
