@@ -1,6 +1,6 @@
 # caminhos para os arquivos de dados e modelos
 RESULTADOS = 'Resultados/'
-ACURACIA = 'Resultados/acuracia.csv'
+ACURACIA = 'Resultados/Acuracia-F1-Score.csv'
 LOG_VAR = 'Resultados/debug_comparacao.txt'
 SOURCE = 'tables/source/*.csv'
 TEST = 'tables/teste/*.csv'
@@ -8,6 +8,8 @@ TEST = 'tables/teste/*.csv'
 
 CREATE_RANGES = False
 GET_CONFUSION_MATRIX = False
+if GET_CONFUSION_MATRIX:
+    ACURACIA = 'Resultados/Acuracia-ConfusionMatrix.csv'
 
 FAIXAS_EXTRAVIO = [1, 24, 72, 168]
 FAIXAS_ATRASO = [1, 4, 8, 12, 16, 24, 28]

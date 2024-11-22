@@ -22,13 +22,13 @@ def compare(src: pd.DataFrame, dst: pd.DataFrame, name: str
     num_rows2, num_cols2 = dst.shape
     
     if num_cols1 != num_cols2:
-        print('Número de colunas diferentes',
-              num_cols1, num_cols2)
+        print('Número de colunas diferentes em', name,
+              'src =', num_cols1, 'dst =', num_cols2)
         return -1, -1, [-1], [-1]
 
     if (num_rows1) != num_rows2:
-        print('Número de linhas diferentes',
-              num_rows1, num_rows2)
+        print('Número de linhas diferentes em', name,
+                'src =',num_rows1, 'dst =', num_rows2)
         return -2, -2, [-2], [-2]
 
     total_errors = 0
