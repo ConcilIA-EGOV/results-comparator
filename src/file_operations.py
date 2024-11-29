@@ -15,19 +15,15 @@ def get_experiments():
     gets all csv files on the folderds tables/sorce and tables/teste
     """
     experiments = []
-    try:
-        source = sorted(glob.glob(SOURCE))
-        teste = sorted(glob.glob(TEST))
-        for s, t in zip(source, teste):
-            if AVG_SHEET:
-                t = get_avg_sheet(t)
-            experiments.append((s, t))
-            # creates the results folder if it doesn't exist
-            folder = RESULTADOS + get_prompt_name(t)
-            os.makedirs(folder, exist_ok=True)
-    except Exception as e:
-        print(e)
-        print("Arquivos não encontrados")
+    source = sorted(glob.glob(SOURCE))
+    teste = sorted(glob.glob(TEST))
+    for s, t in zip(source, teste):
+        if AVG_SHEET:
+            t = get_avg_sheet(t)
+        experiments.append((s, t))
+        # creates the results folder if it doesn't exist
+        folder = RESULTADOS + get_prompt_name(t)
+        os.makedirs(folder, exist_ok=True)
     return experiments
 
 
@@ -50,12 +46,14 @@ def get_avg_sheet(folder_name: str) -> str:
     """
     # verifies if the folder exists and is a folder and not a file
     if not os.path.isdir(folder_name):
-        raise ValueError(f"Tentando transformar em média um arquivo que não é uma pasta: {folder_name}")
+        print(f"Tentando transformar em média um arquivo que não é uma pasta: {folder_name}")
+        return folder_name
     # gets all csv files in the folder
     files = glob.glob(folder_name + '/*.csv')
     # gets the average sheet
     avg_sheet = md.get_avg_sheet(files)
     # saves the average sheet
-    file_name = folder_name + '.csv'
+    f_name = folder_name.split('/')[-1]
+    file_name = folder_name + '/' + f_name + '.csv'
     avg_sheet.to_csv(file_name, index=False)
     return file_name    
