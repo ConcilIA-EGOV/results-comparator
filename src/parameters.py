@@ -10,6 +10,9 @@ CREATE_RANGES = False
 GET_CONFUSION_MATRIX = False
 if GET_CONFUSION_MATRIX:
     ACURACIA = 'Resultados/Acuracia-ConfusionMatrix.csv'
+AVG_SHEET = True
+if AVG_SHEET:
+    TEST = 'tables/teste/*'
 
 FAIXAS_EXTRAVIO = [1, 24, 72, 168]
 FAIXAS_ATRASO = [1, 4, 8, 12, 16, 24, 28]

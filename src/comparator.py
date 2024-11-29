@@ -1,7 +1,7 @@
 import pandas as pd
 import openpyxl
 from collections import defaultdict
-# from math import sqrt
+from math import sqrt
 
 import variable_formatation as vf
 from parameters import DATA_VARS, ACURACIA, GET_CONFUSION_MATRIX
@@ -148,10 +148,10 @@ def measure_results(total_errors, sentence_errors, errors_per_col,
                 str_key = str(key).rjust(2)
                 log_str += ' ' + str_key + ': ' + str_log + ' |'
         else:
-            log = float_string(log/n_sentences)
-            # log = sqrt(log)
+            log = sqrt(log/n_sentences)
+            log = float_string(log)
             csv_line.append(log)
-            log_str += ' MSN (horas): ' + log + ' |'
+            log_str += ' RMSN (horas): ' + log + ' |'
         # formats the variable name to fit 42 caracteres, filling with white spaces
         output += ' ' + variaveis[i].ljust(41) + ' : ' + resultado + log_str + '\n'
 
@@ -186,7 +186,8 @@ def main(source, teste, saida_excel):
 
 def run_comparisons():
     experimentos = []
-    for src, teste in get_experiments():
+    exp = get_experiments()
+    for src, teste in exp:
         saida_excel, log_file = get_save_path(teste)
         csv_line, log = main(src, teste, saida_excel)
         if csv_line == -1:
@@ -203,7 +204,7 @@ def run_comparisons():
     for i in DATA_VARS[1:]:
         if 'intervalo' in i:
             vars.append('AC - ' + i)
-            vars.append('MSN (h) - ' + i)
+            vars.append('RMSN (h) - ' + i)
         else:
             vars.append('AC - ' + i)
             vars.append('F1 - ' + i)

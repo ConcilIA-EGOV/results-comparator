@@ -2,9 +2,12 @@
 Resultados/*
 
 # Ignore changes in the tables folder
-tables/*/*.xlsx
-tables/*/*.csv
-projecao/*.csv
+tables/source/*.csv
+tables/source/*.xlsx
+tables/teste/*.csv
+tables/teste/*.xlsx
+tables/teste/*/*.csv
+tables/teste/*/*.xlsx
 
 # Ignore changes in the build folder
 .vscode/
