@@ -4,7 +4,7 @@ from collections import defaultdict
 from math import sqrt
 
 import variable_formatation as vf
-from parameters import DATA_VARS, ACURACIA, GET_CONFUSION_MATRIX
+from parameters import DATA_VARS, ACURACIA
 from file_operations import get_experiments, get_save_path, get_prompt_name, write_log
 from value_comparation import COMPARISONS
 
@@ -104,7 +104,8 @@ def measure_results(total_errors, sentence_errors, errors_per_col,
     total_values = n_sentences * n_variaveis
     ac_total = get_percentage(total_errors, total_values)
     ac_total_sent = get_percentage(sentence_errors, n_sentences)
-    csv_line = [ac_total, ac_total_sent]
+    csv_line_f1 = [ac_total, ac_total_sent]
+    csv_line_cm = [ac_total, ac_total_sent]
 
     output = f"Nº de Sentenças: {n_sentences} | Nº de Variáveis: {n_variaveis} | Nº Total de Valores: {total_values}\n"
 
@@ -115,15 +116,15 @@ def measure_results(total_errors, sentence_errors, errors_per_col,
     for i in range(n_variaveis):
         var_idx += 1
         while variaveis[i] != DATA_VARS[var_idx]:
-            csv_line.append('////')
-            csv_line.append('////')
-            if GET_CONFUSION_MATRIX:
-                if 'intervalo' not in DATA_VARS[var_idx]:
-                    for _ in range(4):
-                        csv_line.append('////')
+            csv_line_f1.append('////')
+            csv_line_f1.append('////')
+            if 'intervalo' not in DATA_VARS[var_idx]:
+                for _ in range(6):
+                    csv_line_cm.append('////')
             var_idx += 1
         ac = get_percentage(errors_per_col[i], n_sentences)
-        csv_line.append(ac)
+        csv_line_f1.append(ac)
+        csv_line_cm.append(ac)
         media_de_erros_por_variavel += errors_per_col[i]
         resultado = 'Acertos: ' + ac
         log = var_errors[variaveis[i]]
@@ -136,21 +137,22 @@ def measure_results(total_errors, sentence_errors, errors_per_col,
             den = precision + recall
             f1 = (2*(precision*recall)/den) if den != 0 else 0
             f1 = float_string(f1)
-            csv_line.append(f1)
+            csv_line_f1.append(f1)
+            csv_line_cm.append(f1)
             keys = list(log.keys())
             keys.sort()
             keys.reverse()
             for key in keys:
                 val = get_percentage(abs(n_sentences - log[key]), n_sentences)
                 str_log = str(val).rjust(3)
-                if GET_CONFUSION_MATRIX:
-                    csv_line.append(val)
+                csv_line_cm.append(val)
                 str_key = str(key).rjust(2)
                 log_str += ' ' + str_key + ': ' + str_log + ' |'
         else:
             log = sqrt(log/n_sentences)
             log = float_string(log)
-            csv_line.append(log)
+            csv_line_f1.append(log)
+            csv_line_cm.append(log)
             log_str += ' RMSN (horas): ' + log + ' |'
         # formats the variable name to fit 42 caracteres, filling with white spaces
         output += ' ' + variaveis[i].ljust(41) + ' : ' + resultado + log_str + '\n'
@@ -165,7 +167,7 @@ def measure_results(total_errors, sentence_errors, errors_per_col,
     output += ("-------------------------------------------\n")
     output += ('>> Acurácia Total das Sentenças: %s\n' % ac_total_sent)
     output += (">> Acurácia Total: %s\n" % ac_total)
-    return csv_line, output
+    return csv_line_f1, csv_line_cm, output
 
 def main(source, teste, saida_excel):
     # Lê arquivos
@@ -176,7 +178,7 @@ def main(source, teste, saida_excel):
     comparison = compare(df1, df2, saida_excel)
 
     if comparison[0] < 0:
-        return -1, -1
+        return -1, -1, -1
     n_sentences= df1.shape[0]
     # Por causa da coluna da sentença
     variaveis = df1.columns[1:]
@@ -185,41 +187,39 @@ def main(source, teste, saida_excel):
                   variaveis)
 
 def run_comparisons():
-    experimentos = []
+    experimentos_f1 = []
+    experimentos_cm = []
     exp = get_experiments()
     for src, teste in exp:
         saida_excel, log_file = get_save_path(teste)
-        csv_line, log = main(src, teste, saida_excel)
-        if csv_line == -1:
+        csv_line_f1, csv_line_cm, log = main(src, teste, saida_excel)
+        if log == -1:
             continue
         write_log(log_file, log)
         name = get_prompt_name(teste)
-        experimentos.append([name, '-------'] + csv_line)
-        # print("\n######################################",
-        #        "######################################\n",
-        #        log, end='')
-        # break
+        experimentos_f1.append([name, '-------'] + csv_line_f1)
+        experimentos_cm.append([name, '-------'] + csv_line_cm)
     
-    vars = []
+    vars_f1 = []
+    vars_cm = []
     for i in DATA_VARS[1:]:
+        vars_f1.append('AC - ' + i)
+        vars_cm.append('AC - ' + i)
         if 'intervalo' in i:
-            vars.append('AC - ' + i)
-            vars.append('RMSN (h) - ' + i)
+            vars_f1.append('RMSN (h) - ' + i)
+            vars_cm.append('RMSN (h) - ' + i)
         else:
-            vars.append('AC - ' + i)
-            vars.append('F1 - ' + i)
-            if GET_CONFUSION_MATRIX:
-                vars.append('TP - ' + i)
-                vars.append('TN - ' + i)
-                vars.append('FP - ' + i)
-                vars.append('FN - ' + i)  
+            vars_f1.append('F1 - ' + i)
+            vars_cm.append('F1 - ' + i)
+            vars_cm.append('TP - ' + i)
+            vars_cm.append('TN - ' + i)
+            vars_cm.append('FP - ' + i)
+            vars_cm.append('FN - ' + i)
     
-    csv_header = ['Prompt', 'Descrição', 'Acurácia Total', 'Acurácia por Sentença'] + vars
-    try:
-        pd.DataFrame(experimentos, columns=csv_header).to_csv(ACURACIA, index=False)
-    except Exception as e:
-        print(e)
-        print("Erro ao salvar os resultados")
+    csv_header_f1 = ['Prompt', 'Descrição', 'Acurácia Total', 'Acurácia por Sentença'] + vars_f1
+    csv_header_cm = ['Prompt', 'Descrição', 'Acurácia Total', 'Acurácia por Sentença'] + vars_cm
+    pd.DataFrame(experimentos_f1, columns=csv_header_f1).to_csv(ACURACIA, index=False)
+    pd.DataFrame(experimentos_cm, columns=csv_header_cm).to_csv(ACURACIA.replace('F1-Score', 'ConfusionMatrix'), index=False)
 
 if __name__ == '__main__':
     run_comparisons()

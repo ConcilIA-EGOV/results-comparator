@@ -5,13 +5,13 @@ all:
 	@echo "Digite make formating para formatar as variáveis"
 
 run:
+	@rm -rf Resultados/
+	@mkdir Resultados
 	@python3 src/comparator.py
 
 clean:
-	@rm -rf Resultados/*/
-	@rm -rf Resultados/*.xlsx
-	@rm -rf Resultados/*.txt
-	@rm -rf Resultados/*.csv
+	@rm -rf Resultados/
+	@mkdir Resultados
 
 clean_tables:
 	@rm -rf tables/*/*.csv

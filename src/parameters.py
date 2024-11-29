@@ -7,9 +7,6 @@ TEST = 'tables/teste/*.csv'
 
 
 CREATE_RANGES = False
-GET_CONFUSION_MATRIX = False
-if GET_CONFUSION_MATRIX:
-    ACURACIA = 'Resultados/Acuracia-ConfusionMatrix.csv'
 AVG_SHEET = True
 if AVG_SHEET:
     TEST = 'tables/teste/*'
