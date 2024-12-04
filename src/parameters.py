@@ -3,13 +3,11 @@ RESULTADOS = 'Resultados/'
 ACURACIA = 'Resultados/Acuracia-F1-Score.csv'
 LOG_VAR = 'Resultados/debug_comparacao.txt'
 SOURCE = 'tables/source/*.csv'
-TEST = 'tables/teste/*.csv'
+TEST = 'tables/teste/*'
 
 
 CREATE_RANGES = False
-AVG_SHEET = True
-if AVG_SHEET:
-    TEST = 'tables/teste/*'
+AVG_SHEET = False
 
 FAIXAS_EXTRAVIO = [1, 24, 72, 168]
 FAIXAS_ATRASO = [1, 4, 8, 12, 16, 24, 28]

@@ -69,7 +69,7 @@ def format_intervalo(value, interval_values=[]):
     elif type(value) == float:
         if np.isnan(value):
             value = 0
-    elif value in ['-', '', ' ', '--']:
+    elif value in ['-', '', ' ', '--', 'null', 'NULL', 'Null']:
         value = 0
     elif ':' in value:
         value = hour_to_float(value)
@@ -120,15 +120,15 @@ def trim_columns(df: pd.DataFrame):
     return df
 
 def format_data(csv_file:str):
-    # Remover colunas não relacionadas ao experimento
     try:
         log_file.write(f"\n---\nArquivo: {csv_file}\n")
         df = pd.read_csv(csv_file)
-        df = trim_columns(df)
     except Exception as e:
         log_file.write(str(e) + "\n")
         log_file.write("Arquivo não encontrado ou mal formatado\n")
-        return df
+        return None
+    # Remover colunas não relacionadas ao experimento
+    df = trim_columns(df)
     # Aplicar a função de reformatação aos valores float nas colunas
     for coluna in df.columns:
         global current_column
