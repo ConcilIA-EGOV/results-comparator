@@ -111,21 +111,23 @@ def measure_results(total_errors, sentence_errors, errors_per_col,
 
     # Imprime resultados
     output += ('\nAcurácia por Variável:\n')
-    media_de_erros_por_variavel = 0
     var_idx = 0
     for i in range(n_variaveis):
         var_idx += 1
         while variaveis[i] != DATA_VARS[var_idx]:
-            csv_line_f1.append('////')
-            csv_line_f1.append('////')
+            # se o prompt não contiver uma variável dentre as esperadas,
+            # adiciona um valor nulo, para acurácia e F1-Score
+            substituto = ['////', '////']
+            csv_line_f1.extend(substituto)
+            csv_line_cm.extend(substituto)
             if 'intervalo' not in DATA_VARS[var_idx]:
-                for _ in range(6):
-                    csv_line_cm.append('////')
+                # se não for uma variável de intervalo,
+                # adiciona os valores substitutos de TP, TN, FP, FN
+                csv_line_cm.extend(substituto + substituto)
             var_idx += 1
         ac = get_percentage(errors_per_col[i], n_sentences)
         csv_line_f1.append(ac)
         csv_line_cm.append(ac)
-        media_de_erros_por_variavel += errors_per_col[i]
         resultado = 'Acertos: ' + ac
         log = var_errors[variaveis[i]]
         log_str = ' |'
@@ -157,13 +159,6 @@ def measure_results(total_errors, sentence_errors, errors_per_col,
         # formats the variable name to fit 42 caracteres, filling with white spaces
         output += ' ' + variaveis[i].ljust(41) + ' : ' + resultado + log_str + '\n'
 
-    # media_de_erros_por_sentenca = sum(errors_per_line)/n_sentences
-    # media_de_erros_por_variavel = sum(errors_per_col)//n_variaveis
-    # ac_med_var = get_percentage(media_de_erros_por_variavel , n_sentences)
-    # ac_med_sent = get_percentage(media_de_erros_por_sentenca, n_variaveis)
-    # output += ("-------------------------------------------\n")
-    # output += ('Acurácia Média das Variáveis: %s\n' % ac_med_var)
-    # output += ('Acurácia Média das Sentenças: %s\n' % ac_med_sent)
     output += ("-------------------------------------------\n")
     output += ('>> Acurácia Total das Sentenças: %s\n' % ac_total_sent)
     output += (">> Acurácia Total: %s\n" % ac_total)
