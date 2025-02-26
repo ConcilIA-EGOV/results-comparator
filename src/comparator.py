@@ -6,7 +6,7 @@ from math import sqrt
 import variable_formatation as vf
 from parameters import DATA_VARS, ACURACIA
 from file_operations import get_experiments, get_save_path, get_prompt_name, write_log
-from value_comparation import COMPARISONS
+from value_comparation import comparisons
 
 def fill_cell(df, row, col):
     cell = df.cell(row=row+2, column=col+1)
@@ -49,7 +49,7 @@ def compare(src: pd.DataFrame, dst: pd.DataFrame, name: str
     # Percorre as células comparando valores
     names = src.columns
     for c in range(1, num_cols1):
-        func = COMPARISONS[names[c]]
+        func = comparisons(names[c])
         var_errors[names[c]] = defaultdict(int)
         for r1 in range(num_rows1):
             v1 = src.iloc[r1, c]

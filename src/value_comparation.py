@@ -27,22 +27,39 @@ def compare_intervalo(src, dst):
     erro = margin > 1
     return float(margin**2), erro
 
-COMPARISONS = {
-    'direito_de_arrependimento': lambda x, y: compare_binario(x, y),
-    'descumprimento_de_oferta': lambda x, y: compare_binario(x, y),
-    'extravio_definitivo': lambda x, y: compare_binario(x, y),
-    'extravio_temporario': lambda x, y: compare_binario(x, y),
-    'faixa_intervalo_extravio_temporario': lambda x, y: compare_intervalo(x, y),
-    'faixa_intervalo_atraso': lambda x, y: compare_intervalo(x, y),
-    'intervalo_extravio_temporario': lambda x, y: compare_intervalo(x, y),
-    'violacao_furto_avaria': lambda x, y: compare_binario(x, y),
-    'cancelamento/alteracao_destino': lambda x, y: compare_binario(x, y),
-    'atraso': lambda x, y: compare_binario(x, y),
-    'intervalo_atraso': lambda x, y: compare_intervalo(x, y),
-    'culpa_exclusiva_consumidor': lambda x, y: compare_binario(x, y),
-    'condicoes_climaticas/fechamento_aeroporto': lambda x, y: compare_binario(x, y),
-    'noshow': lambda x, y: compare_binario(x, y),
-    'overbooking': lambda x, y: compare_binario(x, y),
-    'assistencia_cia_aerea': lambda x, y: compare_binario(x, y),
-    'hipervulneravel': lambda x, y: compare_binario(x, y),
-}
+def comparisons(name):
+    '''
+    Retorna a função de comparação adequada para a variável
+    '''
+    if name in BIN_VARS:
+        return compare_binario
+    elif name in INTERVAL_VARS:
+        return compare_intervalo
+    else:
+        return None
+
+# variáveis binárias
+BIN_VARS = [
+    'direito_de_arrependimento',
+    'descumprimento_de_oferta',
+    'extravio_definitivo',
+    'extravio_temporario',
+    'violacao_furto_avaria',
+    'cancelamento/alteracao_destino',
+    'atraso',
+    'culpa_exclusiva_consumidor',
+    'condicoes_climaticas/fechamento_aeroporto',
+    'noshow',
+    'overbooking',
+    'assistencia_cia_aerea',
+    'hipervulneravel'
+]
+
+# variáveis contínuas ou categóricas
+INTERVAL_VARS = [
+    'faixa_intervalo_extravio_temporario',
+    'faixa_intervalo_atraso',
+    'intervalo_extravio_temporario',
+    'intervalo_atraso'
+]
+
