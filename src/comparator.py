@@ -9,6 +9,9 @@ from file_operations import get_experiments, get_save_path, get_prompt_name, wri
 from value_comparation import comparisons
 
 def fill_cell(df, row, col):
+    """
+    Pinta a célula de amarelo
+    """
     cell = df.cell(row=row+2, column=col+1)
     cell.fill = openpyxl.styles.PatternFill(fgColor="FFFF00", fill_type = "solid")
     
@@ -44,6 +47,9 @@ def compare(src: pd.DataFrame, dst: pd.DataFrame, name: str
     # Obtém a planilha para poder alterar cores
     sheet = book.active
     if sheet is None:
+        # Tem que ser exatamente assim
+        # se alguém descobrir porque, ou como mudar isso
+        # comente aqui:
         sheet = book.create_sheet('Sheet1')
 
     # Percorre as células comparando valores
@@ -56,18 +62,27 @@ def compare(src: pd.DataFrame, dst: pd.DataFrame, name: str
             v2 = dst.iloc[r1, c]
             result, error = func(v1, v2)
             if type(result) == float:
+                # Se for float, é um erro de intervalo
                 if type(var_errors[names[c]]) == defaultdict:
-                    var_errors[names[c]] = 0
+                    # Se for a primeira vez que o erro é encontrado
+                    # muda o dicionário para um float
+                    var_errors[names[c]] = 0.0
+                # Adiciona o erro ao total
                 var_errors[names[c]] += result
             else:
+                # Se for um erro binário
+                # Adiciona à categoria, TP, TN, FP, FN
                 var_errors[names[c]][result] += 1
             if error:
+                # Se houver erro, marca a célula
                 fill_cell(sheet, r1, c)
                 col_errors[c-1] += 1
                 errors_per_line[r1] += 1
                 total_errors += 1
                 if errors_per_line[r1] == 1:
+                    # Se for o primeiro erro da linha, pinta a célula da sentença
                     fill_cell(sheet, r1, 0)
+                    # Adiciona o erro à contagem de erros em linha
                     line_errors += 1
         if type(var_errors[names[c]]) == defaultdict:
             if 'TP' not in var_errors[names[c]]:
@@ -125,6 +140,7 @@ def measure_results(total_errors, sentence_errors, errors_per_col,
                 # adiciona os valores substitutos de TP, TN, FP, FN
                 csv_line_cm.extend(substituto + substituto)
             var_idx += 1
+        # adds the accuracy per variable
         ac = get_percentage(errors_per_col[i], n_sentences)
         csv_line_f1.append(ac)
         csv_line_cm.append(ac)
@@ -132,6 +148,8 @@ def measure_results(total_errors, sentence_errors, errors_per_col,
         log = var_errors[variaveis[i]]
         log_str = ' |'
         if type(log) != float:
+            # se for uma variável binária,
+            # calcula o F1-Score
             den = log['TP'] + log['FP']
             precision = (log['TP']/den) if den != 0 else 0
             den = log['TP'] + log['FN']
@@ -139,9 +157,11 @@ def measure_results(total_errors, sentence_errors, errors_per_col,
             den = precision + recall
             f1 = (2*(precision*recall)/den) if den != 0 else 0
             f1 = float_string(f1)
+            # adds the F1-Score to the csv line
             csv_line_f1.append(f1)
             csv_line_cm.append(f1)
             keys = list(log.keys())
+            # adds the confusion matrix values to the csv line and output
             keys.sort()
             keys.reverse()
             for key in keys:
@@ -151,6 +171,8 @@ def measure_results(total_errors, sentence_errors, errors_per_col,
                 str_key = str(key).rjust(2)
                 log_str += ' ' + str_key + ': ' + str_log + ' |'
         else:
+            # se for uma variável de intervalo,
+            # calcula o RMSN
             log = sqrt(log/n_sentences)
             log = float_string(log)
             csv_line_f1.append(log)
@@ -164,7 +186,7 @@ def measure_results(total_errors, sentence_errors, errors_per_col,
     output += (">> Acurácia Total: %s\n" % ac_total)
     return csv_line_f1, csv_line_cm, output
 
-def main(source, teste, saida_excel):
+def run_comparisons(source, teste, saida_excel):
     # Lê arquivos
     df1 = vf.format_data(source)
     df2 = vf.format_data(teste)
@@ -178,16 +200,15 @@ def main(source, teste, saida_excel):
     # Por causa da coluna da sentença
     variaveis = df1.columns[1:]
     n_variaveis = len(variaveis)
-    return measure_results(*comparison, n_sentences, n_variaveis,
-                  variaveis)
+    return measure_results(*comparison, n_sentences, n_variaveis, variaveis)
 
-def run_comparisons():
+def main():
     experimentos_f1 = []
     experimentos_cm = []
     exp = get_experiments()
     for src, teste in exp:
         saida_excel, log_file = get_save_path(teste)
-        csv_line_f1, csv_line_cm, log = main(src, teste, saida_excel)
+        csv_line_f1, csv_line_cm, log = run_comparisons(src, teste, saida_excel)
         if log == -1:
             continue
         write_log(log_file, log)
@@ -217,5 +238,5 @@ def run_comparisons():
     pd.DataFrame(experimentos_cm, columns=csv_header_cm).to_csv(ACURACIA.replace('F1-Score', 'ConfusionMatrix'), index=False)
 
 if __name__ == '__main__':
-    run_comparisons()
+    main()
 

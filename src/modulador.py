@@ -1,10 +1,11 @@
 import pandas as pd
 import numpy as np
 
-"""
-Receives a list of dataframes, like-sized, and returns a dataframe with the most frequent values on each cell
-"""
 def get_avg_sheet(dfs_names: list[str]) -> pd.DataFrame:
+    """
+    Receives a list of dataframes, like-sized,
+    and returns a dataframe with the most frequent values on each cell
+    """
     dfs = [pd.read_csv(file) for file in dfs_names]
     shape = dfs[0].shape
     if any(df.shape != shape for df in dfs):
@@ -18,6 +19,8 @@ def get_avg_sheet(dfs_names: list[str]) -> pd.DataFrame:
             avg_cell = []
             for df in dfs:
                 val = df.loc[r, c]
+                # identifies invalid values, like NaN
+                # and inserts a '-' instead
                 if type(val) == float and np.isnan(val):
                     avg_cell.append("-")
                     continue
