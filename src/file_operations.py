@@ -12,9 +12,10 @@ def get_prompt_name(file_name: str):
 
 def get_experiments():
     """
-    gets all csv files on the folderds tables/sorce and tables/teste
+    gets all csv files on the folders entrada/gabarito and entrada/teste
     """
     experiments = []
+    # para garantir a ordem alfabética dos arquivos
     source = sorted(glob.glob(SOURCE))
     teste = sorted(glob.glob(TEST))
     for s, t in zip(source, teste):

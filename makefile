@@ -14,7 +14,7 @@ clean:
 	@mkdir Resultados
 
 clean_tables:
-	@rm -rf tables/*/*.csv
+	@rm -rf entrada/*/*.csv
 
 make formating:
 	@python3 src/variable_formatation.py

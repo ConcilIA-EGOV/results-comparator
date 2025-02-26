@@ -1,13 +1,13 @@
 # Ignore changes in the Result folder
 Resultados/*
 
-# Ignore changes in the tables folder
-tables/source/*.csv
-tables/source/*.xlsx
-tables/teste/*.csv
-tables/teste/*.xlsx
-tables/teste/*/*.csv
-tables/teste/*/*.xlsx
+# Ignore changes in the entrada folder
+entrada/gabarito/*.csv
+entrada/gabarito/*.xlsx
+entrada/teste/*.csv
+entrada/teste/*.xlsx
+entrada/teste/*/*.csv
+entrada/teste/*/*.xlsx
 
 # Ignore changes in the build folder
 .vscode/

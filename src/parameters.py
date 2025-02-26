@@ -2,8 +2,8 @@
 RESULTADOS = 'Resultados/'
 ACURACIA = 'Resultados/Acuracia-F1-Score.csv'
 LOG_VAR = 'Resultados/debug_comparacao.txt'
-SOURCE = 'tables/source/*.csv'
-TEST = 'tables/teste/*'
+SOURCE = 'entrada/gabarito/*.csv'
+TEST = 'entrada/teste/*'
 
 
 CREATE_RANGES = False
