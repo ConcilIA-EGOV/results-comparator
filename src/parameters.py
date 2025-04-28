@@ -52,5 +52,5 @@ DATA_VARS_RANGE = [
     'assistencia_cia_aerea',
     'hipervulneravel'
 ]
-# DATA_VARS = DATA_VARS_RANGE
+DATA_VARS = DATA_VARS_RANGE
 

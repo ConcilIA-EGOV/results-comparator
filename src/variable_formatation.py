@@ -4,7 +4,7 @@ from parameters import FAIXAS_EXTRAVIO, FAIXAS_ATRASO, FAIXAS_DANO
 from parameters import DATA_VARS, CREATE_RANGES
 # from parameters import SOURCE, TEST, ARQUIVO_DE_SAIDA
 from file_operations import log_file
-current_column = ""
+current_column = "dano moral individual"
 
 def hour_to_float(value):
     splits = value.split(":")
@@ -25,11 +25,11 @@ def format_string(value):
     if ',' in value:
         value = value.replace(',', '.')
     if value[-3] == '.':
-        if value[-3:] == '.00':
-            value = value[:-3]
-            if '.' in value:
-                value = value.replace('.', '')
-            return float(value)
+        value = value[:-3]
+        if '.' in value:
+            value = value.replace('.', '')
+        return float(value)
+
     try:
         f_value = float(value)   
     except:
@@ -149,11 +149,11 @@ def main(csv_file):
     # df = df.drop(columns=['sentenca'])
     res_col = 'Dano-Moral'
     df[res_col] = result_col
-    df.to_csv('projecao/formated.csv', index=False)
+    df.to_csv('Resultados/formated.csv', index=False)
 
 if __name__ == "__main__":
     try:
-        csv_file = 'projecao/full.csv'
+        csv_file = 'entrada/teste/formatar.csv'
         main(csv_file)
     except Exception as e:
         print(e)
