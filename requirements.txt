@@ -1,6 +1,5 @@
-pandas
-openpyxl
+glob2
+python-math
 numpy
-glob
-math
-collections
+openpyxl
+pandas
