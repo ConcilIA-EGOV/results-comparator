@@ -110,6 +110,8 @@ def float_string(num):
     return ('%.2d,%.2d' % (num, dec_num))
 
 def get_percentage(value, total):
+    if total == 0:
+        return '////'
     num = (1 - (value/total)) * 100
     return float_string(num) + '%'
 
