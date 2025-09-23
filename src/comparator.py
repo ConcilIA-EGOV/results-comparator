@@ -8,7 +8,7 @@ from parameters import DATA_VARS, ACURACIA
 from file_operations import get_experiments, get_save_path, get_prompt_name, write_log
 from value_comparation import comparisons
 
-def fill_cell(df, row, col):
+def fill_cell(df, row:int, col:int):
     """
     Pinta a célula de amarelo
     """
@@ -18,7 +18,7 @@ def fill_cell(df, row, col):
 
 # Receives 2 excel sheets and compares them
 def compare(src: pd.DataFrame, dst: pd.DataFrame, name: str
-            ) -> tuple[int, int, list[int], list[int]]:
+            ) -> tuple[int, int, list[int], list[int], dict]:
 
     # receiving dataframes sizes
     num_rows1, num_cols1 = src.shape
@@ -27,18 +27,18 @@ def compare(src: pd.DataFrame, dst: pd.DataFrame, name: str
     if num_cols1 != num_cols2:
         print('Número de colunas diferentes em', name,
               'src =', num_cols1, 'dst =', num_cols2)
-        return -1, -1, [-1], [-1]
+        return -1, -1, [-1], [-1], {0: -1}
 
     if (num_rows1) != num_rows2:
         print('Número de linhas diferentes em', name,
                 'src =',num_rows1, 'dst =', num_rows2)
-        return -2, -2, [-2], [-2]
+        return -2, -2, [-2], [-2], {0: -2}
 
     total_errors = 0
     line_errors = 0
     col_errors = [0 for _ in range(num_cols1 - 1)]
-    var_errors = dict()
     errors_per_line = [0 for i in range(num_rows1)]
+    var_errors = dict()
     
     # opens the excel file to write the results
     writer = pd.ExcelWriter(name, engine='openpyxl')
@@ -188,10 +188,10 @@ def measure_results(total_errors, sentence_errors, errors_per_col,
     output += (">> Acurácia Total: %s\n" % ac_total)
     return csv_line_f1, csv_line_cm, output
 
-def run_comparisons(source, teste, saida_excel):
+def run_comparisons(source:str, teste:str, saida_excel:str):
     # Lê arquivos
-    df1 = vf.format_data(source)
-    df2 = vf.format_data(teste)
+    df1 = vf.format_data(source) # pd.DataFrame
+    df2 = vf.format_data(teste) # pd.DataFrame
     
     # Compara arquivos
     comparison = compare(df1, df2, saida_excel)
@@ -215,7 +215,7 @@ def main():
             continue
         write_log(log_file, log)
         name = get_prompt_name(teste)
-        experimentos_f1.append([name, '-------'] + csv_line_f1)
+        experimentos_f1.append([name, '-------'].extend(csv_line_f1))
         experimentos_cm.append([name, '-------'] + csv_line_cm)
     
     vars_f1 = []
