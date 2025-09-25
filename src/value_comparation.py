@@ -1,5 +1,8 @@
 
-def compare_binario(src, dst):
+from typing import Callable
+
+
+def compare_binario(src, dst) -> tuple[str, bool]:
     if src == 1:
         if dst == 1:
             return 'TP', False
@@ -21,13 +24,15 @@ def compare_binario(src, dst):
             return 'FN', True
         if dst == -1:
             return 'TN', False
+    print(f'Valor inesperado na comparação binária: src={src}, dst={dst}')
+    return 'TN', False
 
-def compare_intervalo(src, dst):
+def compare_intervalo(src, dst) -> tuple[float, bool]:
     margin = abs(src - dst)
     erro = margin > 1
     return float(margin**2), erro
 
-def comparisons(name):
+def comparisons(name)-> Callable:
     '''
     Retorna a função de comparação adequada para a variável
     '''
@@ -36,7 +41,7 @@ def comparisons(name):
     elif name in INTERVAL_VARS:
         return compare_intervalo
     else:
-        return None
+        return lambda x, y: (0.0, False)
 
 # variáveis binárias
 BIN_VARS = [

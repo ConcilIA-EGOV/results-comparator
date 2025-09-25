@@ -1,5 +1,5 @@
 import pandas as pd
-import openpyxl
+from openpyxl import styles
 from collections import defaultdict
 from math import sqrt
 
@@ -13,7 +13,7 @@ def fill_cell(df, row:int, col:int):
     Pinta a célula de amarelo
     """
     cell = df.cell(row=row+2, column=col+1)
-    cell.fill = openpyxl.styles.PatternFill(fgColor="FFFF00", fill_type = "solid")
+    cell.fill = styles.PatternFill(fgColor="FFFF00", fill_type = "solid")
     
 
 # Receives 2 excel sheets and compares them
@@ -97,11 +97,13 @@ def compare(src: pd.DataFrame, dst: pd.DataFrame, name: str
 
     # Exporta o dataframe modificado
     dst.to_excel(writer, index=False) 
-    writer._save()
+    dst.to_csv(name.replace('.xlsx', '.csv'), index=False)
+    # writer.save()
+    writer.close()
 
     return total_errors, line_errors, col_errors, errors_per_line, var_errors
 
-def float_string(num):
+def float_string(num) -> str:
     num_int = int(num)
     dec_num = round(num - num_int, 2)*100
     if dec_num == 100:
@@ -109,7 +111,7 @@ def float_string(num):
         num += 1
     return ('%.2d,%.2d' % (num, dec_num))
 
-def get_percentage(value, total):
+def get_percentage(value, total) -> str:
     if total == 0:
         return '////'
     num = (1 - (value/total)) * 100
@@ -117,7 +119,7 @@ def get_percentage(value, total):
 
 def measure_results(total_errors, sentence_errors, errors_per_col,
                     errors_per_line, var_errors, n_sentences,
-                    n_variaveis, variaveis):
+                    n_variaveis, variaveis) -> tuple[list[str], list[str], str]:
     total_values = n_sentences * n_variaveis
     ac_total = get_percentage(total_errors, total_values)
     ac_total_sent = get_percentage(sentence_errors, n_sentences)
@@ -197,7 +199,7 @@ def run_comparisons(source:str, teste:str, saida_excel:str):
     comparison = compare(df1, df2, saida_excel)
 
     if comparison[0] < 0:
-        return -1, -1, -1
+        return ['-1'], ['-1'], '-1'
     n_sentences= df1.shape[0]
     # Por causa da coluna da sentença
     variaveis = df1.columns[1:]
@@ -211,11 +213,12 @@ def main():
     for src, teste in exp:
         saida_excel, log_file = get_save_path(teste)
         csv_line_f1, csv_line_cm, log = run_comparisons(src, teste, saida_excel)
-        if log == -1:
+        if log == '-1':
+            print('Erro ao comparar', teste)
             continue
         write_log(log_file, log)
         name = get_prompt_name(teste)
-        experimentos_f1.append([name, '-------'].extend(csv_line_f1))
+        experimentos_f1.append([name, '-------'] + csv_line_f1)
         experimentos_cm.append([name, '-------'] + csv_line_cm)
     
     vars_f1 = []
@@ -235,8 +238,10 @@ def main():
             vars_cm.append('FN - ' + i)
     
     csv_header_f1 = ['Prompt', 'Descrição', 'Acurácia Total', 'Acurácia por Sentença'] + vars_f1
-    csv_header_cm = ['Prompt', 'Descrição', 'Acurácia Total', 'Acurácia por Sentença'] + vars_cm
+    print('Salvando resultados em', ACURACIA)
     pd.DataFrame(experimentos_f1, columns=csv_header_f1).to_csv(ACURACIA, index=False)
+    csv_header_cm = ['Prompt', 'Descrição', 'Acurácia Total', 'Acurácia por Sentença'] + vars_cm
+    print('Salvando resultados em', ACURACIA.replace('F1-Score', 'ConfusionMatrix'))
     pd.DataFrame(experimentos_cm, columns=csv_header_cm).to_csv(ACURACIA.replace('F1-Score', 'ConfusionMatrix'), index=False)
 
 if __name__ == '__main__':
