@@ -96,6 +96,7 @@ FUNCTIONS = {
     'faixa_intervalo_extravio_temporario': lambda x: int(x),
     'violacao_furto_avaria': lambda x: format_binario(x),
     'cancelamento/alteracao_destino': lambda x: format_binario(x),
+    'cancelamento': lambda x: format_binario(x),
     'atraso': lambda x: format_binario(x),
     'intervalo_atraso': lambda x: format_intervalo(x, FAIXAS_ATRASO),
     'faixa_intervalo_atraso': lambda x: int(x),
@@ -106,7 +107,8 @@ FUNCTIONS = {
     'assistencia_cia_aerea': lambda x: format_binario(x, -1),
     'hipervulneravel': lambda x: format_binario(x),
     'dano_moral_individual': lambda x: format_intervalo(x, FAIXAS_DANO),
-    'faixa_dano_moral_individual': lambda x: int(x)
+    'faixa_dano_moral_individual': lambda x: int(x),
+    'Dano-Moral': lambda x: x,
 }
 
 def trim_columns(df: pd.DataFrame):
@@ -119,14 +121,14 @@ def trim_columns(df: pd.DataFrame):
     # log_file.write(f"Colunas restantes: {df.columns.to_list()}\n")
     return df
 
-def format_data(csv_file:str):
+def format_data(csv_file:str) -> pd.DataFrame:
     try:
         log_file.write(f"\n---\nArquivo: {csv_file}\n")
         df = pd.read_csv(csv_file)
     except Exception as e:
         log_file.write(str(e) + "\n")
         log_file.write("Arquivo não encontrado ou mal formatado\n")
-        return None
+        return pd.DataFrame()
     # Remover colunas não relacionadas ao experimento
     df = trim_columns(df)
     # Aplicar a função de reformatação aos valores float nas colunas

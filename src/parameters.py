@@ -13,44 +13,25 @@ FAIXAS_EXTRAVIO = [1, 24, 72, 168]
 FAIXAS_ATRASO = [1, 4, 8, 12, 16, 24, 28]
 FAIXAS_DANO = [1, 2000, 4000, 6000, 8000, 10000]
 
-# Variáveis contínuas
 DATA_VARS = [
     "sentenca",
     'direito_de_arrependimento',
     'descumprimento_de_oferta',
     'extravio_definitivo',
     'extravio_temporario',
-    'intervalo_extravio_temporario',
+    'faixa_intervalo_extravio_temporario',
+    #'intervalo_extravio_temporario',
     'violacao_furto_avaria',
-    'cancelamento/alteracao_destino',
+    'cancelamento',
     'atraso',
-    'intervalo_atraso',
+    #'intervalo_atraso',
+    'faixa_intervalo_atraso',
     'culpa_exclusiva_consumidor',
+    # 'fechamento_aeroporto',
     'condicoes_climaticas/fechamento_aeroporto',
     'noshow',
     'overbooking',
     'assistencia_cia_aerea',
     'hipervulneravel',
+    'Dano-Moral',
 ]
-
-# Variáveis categorizadas
-DATA_VARS_RANGE = [
-    "sentenca",
-    'direito_de_arrependimento',
-    'descumprimento_de_oferta',
-    'extravio_definitivo',
-    'extravio_temporario',
-    'faixa_intervalo_extravio_temporario',
-    'violacao_furto_avaria',
-    'cancelamento/alteracao_destino',
-    'atraso',
-    'faixa_intervalo_atraso',
-    'culpa_exclusiva_consumidor',
-    'condicoes_climaticas/fechamento_aeroporto',
-    'noshow',
-    'overbooking',
-    'assistencia_cia_aerea',
-    'hipervulneravel'
-]
-DATA_VARS = DATA_VARS_RANGE
-
